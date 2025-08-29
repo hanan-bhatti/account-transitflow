@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | TransitFlow</title>
+    <link rel="icon" href="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            line-height: 1.5;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 32px;
+        }
+
+        .error-code {
+            font-size: 72px;
+            font-weight: 300;
+            color: #5f6368;
+            margin-bottom: 16px;
+            letter-spacing: -2px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 400;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #5f6368;
+            margin-bottom: 48px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            background: none;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            color: #3c4043;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+
+        .btn-primary {
+            background: #1a73e8;
+            border-color: #1a73e8;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1557b0;
+        }
+
+        /* Konami Code Easter Egg Styles */
+        .legendary-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(45deg, #000, #1a1a2e, #16213e);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+        }
+
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            color: #00ff41;
+            opacity: 0.8;
+            white-space: pre;
+            line-height: 1.2;
+        }
+
+        .legendary-title {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #00ff41;
+            text-align: center;
+        }
+
+        .legendary-subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        .legendary-ascii {
+            font-size: 8px;
+            line-height: 1;
+            margin: 20px 0;
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        .legendary-message {
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            padding: 0 20px;
+            max-width: 600px;
+        }
+
+        .legendary-close {
+            background: transparent;
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 12px 24px;
+            margin-top: 30px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .legendary-close:hover {
+            background: #00ff41;
+            color: #000;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .error-code {
+                font-size: 48px;
+            }
+            
+            .title {
+                font-size: 20px;
+            }
+
+            .legendary-title {
+                font-size: 32px;
+            }
+
+            .legendary-ascii {
+                font-size: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj" alt="TransitFlow" class="logo">
+    
+    <div class="error-code">404</div>
+    <h1 class="title">This page isn't available</h1>
+    <p class="subtitle">The page you requested cannot be found. But legends know the way...</p>
+    
+    <div class="actions">
+        <a href="/" class="btn btn-primary">Go home</a>
+        <button onclick="history.back()" class="btn">Go back</button>
+    </div>
+
+    <!-- Konami Code Legendary Mode -->
+    <div id="legendaryMode" class="legendary-mode hidden">
+        <div class="matrix-bg" id="matrixBg"></div>
+        
+        <div class="legendary-title">LEGENDARY MODE ACTIVATED</div>
+        <div class="legendary-subtitle">The Konami Code Master Has Arrived</div>
+        
+        <div class="legendary-ascii">
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ░░█▀▀░█▀█░█▀▄░█▀▀░░░█▀▄░█▀█░█▀▀░█▀▀░░
+    ░░█░░░█░█░█░█░█▀▀░░░█▀▄░█░█░▀▀█░▀▀█░░
+    ░░▀▀▀░▀▀▀░▀▀░░▀▀▀░░░▀▀░░▀▀▀░▀▀▀░▀▀▀░░
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+        </div>
+        
+        <div class="legendary-message">
+            You have unlocked the ancient power of the Konami Code!<br><br>
+            
+            ↑ ↑ ↓ ↓ ← → ← → B A<br><br>
+            
+            This legendary sequence has granted 30 lives to countless warriors since 1986.<br>
+            You are now part of gaming history, a keeper of the sacred code.<br><br>
+            
+            <strong>LEGENDARY STATUS: UNLOCKED</strong><br>
+            Welcome to the ranks of true gamers.
+        </div>
+        
+        <button class="legendary-close" onclick="closeLegendaryMode()">EXIT LEGENDARY MODE</button>
+    </div>
+
+    <script>
+        // Konami Code Implementation
+        let konamiSequence = [];
+        const konamiCode = [
+            'ArrowUp', 'ArrowUp', 
+            'ArrowDown', 'ArrowDown', 
+            'ArrowLeft', 'ArrowRight', 
+            'ArrowLeft', 'ArrowRight', 
+            'KeyB', 'KeyA'
+        ];
+
+        // Matrix Rain Effect
+        function createMatrixRain() {
+            const matrixBg = document.getElementById('matrixBg');
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+            const columns = Math.floor(window.innerWidth / 20);
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = i * 20 + 'px';
+                column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                column.style.animationDelay = Math.random() * 2 + 's';
+                
+                let text = '';
+                for (let j = 0; j < 50; j++) {
+                    text += chars[Math.floor(Math.random() * chars.length)] + '\n';
+                }
+                column.textContent = text;
+                
+                // Animate the column
+                let position = -100;
+                const animate = () => {
+                    position += 2;
+                    column.style.top = position + 'px';
+                    if (position < window.innerHeight + 100) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        position = -100;
+                        requestAnimationFrame(animate);
+                    }
+                };
+                setTimeout(animate, Math.random() * 2000);
+                
+                matrixBg.appendChild(column);
+            }
+        }
+
+        function activateLegendaryMode() {
+            const legendaryMode = document.getElementById('legendaryMode');
+            legendaryMode.classList.remove('hidden');
+            createMatrixRain();
+            
+            // Play legendary sound effect (if you want to add audio)
+            console.log('🎮 LEGENDARY MODE ACTIVATED! 🎮');
+            console.log('The ancient Konami Code has been honored!');
+            
+            // Reset sequence
+            konamiSequence = [];
+        }
+
+        function closeLegendaryMode() {
+            const legendaryMode = document.getElementById('legendaryMode');
+            const matrixBg = document.getElementById('matrixBg');
+            
+            legendaryMode.classList.add('hidden');
+            matrixBg.innerHTML = ''; // Clear matrix rain
+        }
+
+        // Konami Code Listener
+        document.addEventListener('keydown', function(e) {
+            konamiSequence.push(e.code);
+            
+            // Keep only the last 10 keys
+            if (konamiSequence.length > 10) {
+                konamiSequence.shift();
+            }
+            
+            // Check if sequence matches Konami code
+            if (konamiSequence.length === 10) {
+                const matches = konamiSequence.every((key, index) => key === konamiCode[index]);
+                if (matches) {
+                    activateLegendaryMode();
+                }
+            }
+        });
+
+        // Escape key to close legendary mode
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Escape') {
+                closeLegendaryMode();
+            }
+        });
+    </script>
+</body>
+</html>

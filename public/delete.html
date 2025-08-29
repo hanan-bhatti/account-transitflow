@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Authentication - TransitFlow</title>
+    <link rel="icon"
+        href="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+        type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Theme variables */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.25);
+            --bg-overlay: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+            padding: 1rem;
+        }
+
+        /* Animated background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(1px);
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Main content wrapper */
+        .main-content {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            min-height: calc(100vh - 2rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .logo:hover {
+            transform: scale(1.05) rotate(3deg);
+        }
+
+        .brand-name {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+        }
+
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px -5px var(--shadow);
+        }
+
+        .status-icon.danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            animation: pulse-danger 2s infinite;
+        }
+
+        .status-icon.success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            animation: pulse-success 2s infinite;
+        }
+
+        .status-icon.default {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            animation: pulse-primary 2s infinite;
+        }
+
+        @keyframes pulse-danger {
+            0%, 100% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(239, 68, 68, 0); }
+        }
+
+        @keyframes pulse-success {
+            0%, 100% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulse-primary {
+            0%, 100% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(59, 130, 246, 0); }
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Content sections */
+        .user-info, .danger-zone {
+            background: var(--bg-secondary);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .user-info {
+            border-left: 4px solid var(--accent-primary);
+            text-align: left;
+        }
+
+        .user-info p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .user-info strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .danger-zone {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.04));
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            text-align: left;
+        }
+
+        .danger-zone h3 {
+            color: var(--danger);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .warning-list {
+            margin: 1rem 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .warning-list li {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.9rem;
+        }
+
+        .warning-list li::before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 0.9rem;
+            color: var(--danger);
+        }
+
+        /* Forms */
+        .form-container {
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.01em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-primary);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input.danger {
+            border-color: var(--danger);
+            background: var(--bg-primary);
+            color: var(--danger);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .form-input.danger:focus {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            min-width: 150px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--text-secondary), #4b5563);
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            box-shadow: 0 8px 25px rgba(100, 116, 139, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .button-group {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            font-weight: 500;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            animation: slideDown 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.06));
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.06));
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+            margin-top: 0.1rem;
+            flex-shrink: 0;
+        }
+
+        /* Loading indicator */
+        .loading-indicator {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        .loading-indicator.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Theme indicator */
+        .theme-indicator {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--bg-secondary);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .theme-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Location permission modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Hidden sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Dark theme support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0f172a;
+                --bg-secondary: #1e293b;
+                --bg-tertiary: #334155;
+                --text-primary: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --text-muted: #94a3b8;
+                --border-color: #475569;
+                --bg-overlay: rgba(15, 23, 42, 0.9);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 1rem 0;
+            }
+
+            .brand-name, .page-title {
+                font-size: 1.75rem;
+            }
+
+            .logo, .status-icon {
+                width: 64px;
+                height: 64px;
+            }
+
+            .status-icon {
+                font-size: 1.75rem;
+            }
+
+            .btn {
+                margin: 0.25rem;
+                min-width: 120px;
+                font-size: 0.9rem;
+            }
+
+            .theme-indicator {
+                position: static;
+                margin: 2rem auto 0;
+                display: block;
+                width: fit-content;
+                bottom: auto;
+                right: auto;
+            }
+
+            .modal {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .brand-name, .page-title {
+                font-size: 1.5rem;
+            }
+
+            .form-input, .btn {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body::before,
+            body::after,
+            .theme-indicator,
+            .modal-overlay {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Location Permission Modal -->
+    <div class="modal-overlay" id="locationModal">
+        <div class="modal">
+            <h3>
+                <i class="bx bx-location-plus"></i>
+                Enable Location
+            </h3>
+            <p>
+                We'd like to use your location to provide weather-based themes and better user experience. 
+                Your location data is not stored and only used for theming.
+            </p>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="requestLocation()">
+                    <i class="bx bx-check"></i>
+                    Allow Location
+                </button>
+                <button class="btn btn-secondary" onclick="dismissLocationModal()">
+                    <i class="bx bx-x"></i>
+                    Skip
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Indicator -->
+    <div class="theme-indicator" id="themeIndicator">
+        Default Theme
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Account Deletion Confirmation Section -->
+        <div id="confirm-deletion-section" class="content-section">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+                        alt="TransitFlow Logo" class="logo">
+                    <h1 class="brand-name">TransitFlow</h1>
+                </div>
+                <div class="status-icon danger">
+                    <i class="bx bx-error-circle"></i>
+                </div>
+                <h2 class="page-title">Confirm Account Deletion</h2>
+                <p class="subtitle">
+                    You're about to permanently delete your account. This action cannot be undone and all your data will be lost forever.
+                </p>
+            </div>
+
+            <div class="user-info" id="user-info">
+                <p><strong>Account:</strong> <span id="user-email">Loading...</span></p>
+                <p><strong>Name:</strong> <span id="user-name">Loading...</span></p>
+            </div>
+
+            <div class="danger-zone">
+                <h3>
+                    <i class="bx bx-skull"></i>
+                    Critical Warning
+                </h3>
+                <ul class="warning-list">
+                    <li>All your data will be permanently deleted</li>
+                    <li>Your profile and content will be removed</li>
+                    <li>This action cannot be reversed or undone</li>
+                    <li>You will lose access to all services immediately</li>
+                </ul>
+            </div>
+
+            <div id="deletion-error-message" class="alert error" style="display: none;">
+                <i class="bx bx-error alert-icon"></i>
+                <span id="deletion-error-text"></span>
+            </div>
+
+            <form id="deletionForm" class="form-container">
+                <input type="hidden" id="deletion-token" name="token">
+                <input type="hidden" id="csrf-token" name="_csrf">
+
+                <div class="form-group">
+                    <label for="confirmText" class="form-label">Type "DELETE MY ACCOUNT" to confirm:</label>
+                    <input type="text" id="confirmText" name="confirmText" 
+                           class="form-input danger" 
+                           placeholder="DELETE MY ACCOUNT" 
+                           autocomplete="off"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Enter your password to confirm:</label>
+                    <input type="password" id="password" name="password" 
+                           class="form-input"
+                           placeholder="Enter your password"
+                           autocomplete="current-password"
+                           required>
+                </div>
+
+                <div class="loading-indicator" id="loading">
+                    <div class="spinner"></div>
+                    <span>Deleting account...</span>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
+                        <i class="bx bx-trash"></i>
+                        Delete My Account
+                    </button>
+                    <a href="/" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back"></i>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Deletion Success Section -->
+        <div id="deletion-success-section" class="content-section">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+                        alt="TransitFlow Logo" class="logo">
+                    <h1 class="brand-name">TransitFlow</h1>
+                </div>
+                <div class="status-icon success">
+                    <i class="bx bx-check-circle"></i>
+                </div>
+                <h2 class="page-title">Account Deleted Successfully</h2>
+                <p class="subtitle">Your account has been permanently deleted from our systems.</p>
+            </div>
+            
+            <div class="alert success">
+                <i class="bx bx-check-circle alert-icon"></i>
+                <div>
+                    <p><strong>Account <span id="success-user-email"></span> has been deleted.</strong></p>
+                    <p>All your data has been securely removed from our systems.</p>
+                    <p>Thank you for using TransitFlow.</p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <a href="/" class="btn btn-primary">
+                    <i class="bx bx-home"></i>
+                    Back to Home
+                </a>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div id="error-section" class="content-section">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+                        alt="TransitFlow Logo" class="logo">
+                    <h1 class="brand-name">TransitFlow</h1>
+                </div>
+                <div class="status-icon danger">
+                    <i class="bx bx-error-circle"></i>
+                </div>
+                <h2 class="page-title">Error</h2>
+                <p class="subtitle">Something went wrong with your request.</p>
+            </div>
+            
+            <div class="alert error">
+                <i class="bx bx-error alert-icon"></i>
+                <span id="error-message-text"></span>
+            </div>
+
+            <div class="button-group" id="error-buttons">
+                <a href="/login" class="btn btn-primary">
+                    <i class="bx bx-lock-alt"></i>
+                    Back to Login
+                </a>
+                <a href="/" class="btn btn-secondary">
+                    <i class="bx bx-home"></i>
+                    Home
+                </a>
+            </div>
+        </div>
+
+        <!-- Default Auth Section -->
+        <div id="default-auth-section" class="content-section">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+                        alt="TransitFlow Logo" class="logo">
+                    <h1 class="brand-name">TransitFlow</h1>
+                </div>
+                <div class="status-icon default">
+                    <i class="bx bx-shield-alt-2"></i>
+                </div>
+                <h2 class="page-title">Authentication</h2>
+                <p class="subtitle">
+                    Secure access to your TransitFlow account and services
+                </p>
+            </div>
+            
+            <div class="button-group">
+                <a href="/login" class="btn btn-primary">
+                    <i class="bx bx-log-in"></i>
+                    Login
+                </a>
+                <a href="/register" class="btn btn-secondary">
+                    <i class="bx bx-user-plus"></i>
+                    Register
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'https://api-auth.transitflow.qzz.io/api';
+        
+        // Global state
+        let currentState = {
+            userEmail: '',
+            userName: '',
+            deletionToken: '',
+            csrfToken: ''
+        };
+
+        // Theme and location management (keeping original functionality)
+        let currentTheme = null;
+        let locationPermissionAsked = false;
+        
+        const themeIndicator = document.getElementById('themeIndicator');
+        const locationModal = document.getElementById('locationModal');
+
+        // Apply theme to CSS variables
+        function applyTheme(theme) {
+            if (!theme || !theme.colors) return;
+
+            const root = document.documentElement;
+            Object.entries(theme.colors).forEach(([property, value]) => {
+                root.style.setProperty(property, value);
+            });
+
+            currentTheme = theme;
+            updateThemeIndicator(theme);
+        }
+
+        // Update theme indicator
+        function updateThemeIndicator(theme) {
+            if (theme?.name) {
+                themeIndicator.textContent = theme.name;
+            } else {
+                themeIndicator.textContent = 'Default Theme';
+            }
+            
+            themeIndicator.classList.add('show');
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                themeIndicator.classList.remove('show');
+            }, 3000);
+        }
+
+        // Show location permission modal
+        function showLocationModal() {
+            if (!locationPermissionAsked) {
+                locationModal.style.display = 'flex';
+            }
+        }
+
+        // Dismiss location modal
+        function dismissLocationModal() {
+            locationModal.style.display = 'none';
+            locationPermissionAsked = true;
+            localStorage.setItem('locationPermissionAsked', 'true');
+            fetchThemeWithoutLocation();
+        }
+
+        // Request location permission
+        async function requestLocation() {
+            locationModal.style.display = 'none';
+            locationPermissionAsked = true;
+            localStorage.setItem('locationPermissionAsked', 'true');
+            
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        timeout: 10000,
+                        enableHighAccuracy: false,
+                        maximumAge: 300000 // 5 minutes
+                    });
+                });
+                
+                localStorage.setItem('locationAllowed', 'true');
+                await fetchThemeWithLocation(position.coords);
+            } catch (error) {
+                console.warn('Location access denied or failed:', error);
+                localStorage.setItem('locationAllowed', 'false');
+                await fetchThemeWithoutLocation();
+            }
+        }
+
+        // Fetch theme with location data
+        async function fetchThemeWithLocation(coords) {
+            try {
+                const weatherResponse = await fetch(
+                    `${API_BASE_URL}/weather?lat=${coords.latitude}&lon=${coords.longitude}`,
+                    { 
+                        credentials: 'include',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    }
+                );
+
+                let weather = null;
+                let location = 'Pakistan';
+
+                if (weatherResponse.ok) {
+                    const weatherData = await weatherResponse.json();
+                    weather = weatherData.condition;
+                    location = `${weatherData.city}, ${weatherData.country}`;
+                }
+
+                await fetchTheme(weather, location);
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+                await fetchThemeWithoutLocation();
+            }
+        }
+
+        // Fetch theme without location
+        async function fetchThemeWithoutLocation() {
+            await fetchTheme(null, 'Pakistan');
+        }
+
+        // Main theme fetching function
+        async function fetchTheme(weather = null, location = 'Pakistan') {
+            try {
+                const themeUrl = new URL(`${API_BASE_URL}/theme`);
+                themeUrl.searchParams.set('date', new Date().toISOString());
+                if (weather) themeUrl.searchParams.set('weather', weather);
+                themeUrl.searchParams.set('location', location);
+
+                const themeResponse = await fetch(themeUrl, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+
+                if (themeResponse.ok) {
+                    const theme = await themeResponse.json();
+                    applyTheme(theme);
+                } else {
+                    console.warn('Failed to fetch theme, using default');
+                    updateThemeIndicator({ name: 'Default' });
+                }
+            } catch (error) {
+                console.error('Error fetching theme:', error);
+                updateThemeIndicator({ name: 'Default' });
+            }
+        }
+
+        // Check if should show location modal
+        function checkLocationPermission() {
+            const permissionAsked = localStorage.getItem('locationPermissionAsked');
+            const locationAllowed = localStorage.getItem('locationAllowed');
+            
+            if (!permissionAsked) {
+                setTimeout(showLocationModal, 1500);
+            } else if (locationAllowed === 'true' && navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => fetchThemeWithLocation(position.coords),
+                    () => fetchThemeWithoutLocation(),
+                    { timeout: 5000, maximumAge: 300000 }
+                );
+            } else {
+                fetchThemeWithoutLocation();
+            }
+        }
+
+        // Utility functions
+        function getUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                token: urlParams.get('token'),
+                success: urlParams.get('success') === 'true',
+                error: urlParams.get('error')
+            };
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show target section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+        }
+
+        function showError(message, showBackToLogin = false) {
+            document.getElementById('error-message-text').textContent = message;
+            document.getElementById('error-buttons').style.display = showBackToLogin ? 'block' : 'none';
+            showSection('error-section');
+            document.getElementById('page-title').textContent = 'Error - TransitFlow';
+        }
+
+        function showSuccess(userEmail) {
+            document.getElementById('success-user-email').textContent = userEmail;
+            showSection('deletion-success-section');
+            document.getElementById('page-title').textContent = 'Account Deleted - TransitFlow';
+        }
+
+        function showConfirmDeletion(data) {
+            document.getElementById('user-email').textContent = data.userEmail;
+            document.getElementById('user-name').textContent = data.userName;
+            document.getElementById('deletion-token').value = data.deletionToken;
+            
+            currentState.userEmail = data.userEmail;
+            currentState.userName = data.userName;
+            currentState.deletionToken = data.deletionToken;
+            
+            showSection('confirm-deletion-section');
+            document.getElementById('page-title').textContent = 'Confirm Deletion - TransitFlow';
+            
+            // Auto-focus confirmation input
+            setTimeout(() => {
+                document.getElementById('confirmText').focus();
+            }, 100);
+        }
+
+        // API Functions
+        async function validateDeletionToken(token) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/confirm-deletion?token=${encodeURIComponent(token)}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    return result.data;
+                } else {
+                    throw new Error(result.message || 'Invalid or expired token');
+                }
+            } catch (error) {
+                console.error('Token validation error:', error);
+                throw error;
+            }
+        }
+
+        async function submitDeletion(formData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/confirm-deletion`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        token: formData.token,
+                        confirmText: formData.confirmText,
+                        password: formData.password
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Deletion failed');
+                }
+
+                return result;
+            } catch (error) {
+                console.error('Deletion submission error:', error);
+                throw error;
+            }
+        }
+
+        // Form validation and handling
+        function setupDeletionForm() {
+            const confirmInput = document.getElementById('confirmText');
+            const passwordInput = document.getElementById('password');
+            const deleteBtn = document.getElementById('deleteBtn');
+            const form = document.getElementById('deletionForm');
+            const loading = document.getElementById('loading');
+            const errorAlert = document.getElementById('deletion-error-message');
+            const errorText = document.getElementById('deletion-error-text');
+
+            function validateForm() {
+                const confirmText = confirmInput.value.trim();
+                const password = passwordInput.value.trim();
+                
+                if (confirmText === 'DELETE MY ACCOUNT' && password.length > 0) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.style.opacity = '1';
+                } else {
+                    deleteBtn.disabled = true;
+                    deleteBtn.style.opacity = '0.6';
+                }
+            }
+
+            function showFormError(message) {
+                errorText.textContent = message;
+                errorAlert.style.display = 'flex';
+                errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function hideFormError() {
+                errorAlert.style.display = 'none';
+            }
+
+            // Validate form on input
+            confirmInput.addEventListener('input', () => {
+                validateForm();
+                hideFormError();
+            });
+            
+            passwordInput.addEventListener('input', () => {
+                validateForm();
+                hideFormError();
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (deleteBtn.disabled) {
+                    return;
+                }
+                
+                hideFormError();
+                loading.classList.add('show');
+                deleteBtn.disabled = true;
+                deleteBtn.innerHTML = `
+                    <div class="spinner" style="width: 16px; height: 16px; margin-right: 0.5rem;"></div>
+                    Deleting...
+                `;
+                
+                // Disable all form inputs
+                const inputs = form.querySelectorAll('input, button');
+                inputs.forEach(input => input.disabled = true);
+
+                try {
+                    const formData = {
+                        token: document.getElementById('deletion-token').value,
+                        confirmText: confirmInput.value.trim(),
+                        password: passwordInput.value.trim()
+                    };
+
+                    const result = await submitDeletion(formData);
+                    
+                    if (result.success) {
+                        if (result.data && result.data.isDeletionSuccess) {
+                            showSuccess(result.data.userEmail || currentState.userEmail);
+                        } else {
+                            showSuccess(currentState.userEmail);
+                        }
+                    } else {
+                        throw new Error(result.message || 'Deletion failed');
+                    }
+
+                } catch (error) {
+                    console.error('Form submission error:', error);
+                    
+                    // Re-enable form
+                    inputs.forEach(input => input.disabled = false);
+                    loading.classList.remove('show');
+                    deleteBtn.innerHTML = `
+                        <i class="bx bx-trash"></i>
+                        Delete My Account
+                    `;
+                    validateForm();
+                    
+                    // Show error message
+                    showFormError(error.message || 'An error occurred while deleting your account. Please try again.');
+                }
+            });
+
+            // Initial validation
+            validateForm();
+        }
+
+        // Page initialization
+        async function initializePage() {
+            const params = getUrlParams();
+            
+            if (params.success) {
+                // Handle success from URL parameter
+                showSuccess(params.email || 'your account');
+                return;
+            }
+            
+            if (params.error) {
+                // Handle error from URL parameter
+                showError(params.error, true);
+                return;
+            }
+            
+            if (params.token) {
+                // Handle deletion confirmation
+                try {
+                    const tokenData = await validateDeletionToken(params.token);
+                    showConfirmDeletion(tokenData);
+                    setupDeletionForm();
+                } catch (error) {
+                    console.error('Token validation failed:', error);
+                    showError(error.message || 'This deletion link is invalid or has expired.', true);
+                }
+                return;
+            }
+            
+            // Default state - show authentication options
+            showSection('default-auth-section');
+            document.getElementById('page-title').textContent = 'Authentication - TransitFlow';
+        }
+
+        // Enhanced input animations (keeping original functionality)
+        function setupInputAnimations() {
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                    this.parentElement.style.transition = 'transform 0.2s ease';
+                });
+
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+
+                // Add input validation feedback
+                input.addEventListener('input', function() {
+                    if (this.validity.valid) {
+                        this.style.borderColor = 'var(--success)';
+                    } else if (this.value.length > 0) {
+                        this.style.borderColor = 'var(--danger)';
+                    } else {
+                        this.style.borderColor = 'var(--border-color)';
+                    }
+                });
+            });
+        }
+
+        // Button interaction enhancements (keeping original functionality)
+        function setupButtonAnimations() {
+            document.querySelectorAll('.btn').forEach(btn => {
+                // Add ripple effect on click
+                btn.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // Add ripple effect styles
+            const rippleStyles = document.createElement('style');
+            rippleStyles.textContent = `
+                .btn {
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .ripple {
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: scale(0);
+                    animation: ripple-animation 0.6s linear;
+                    pointer-events: none;
+                }
+                
+                @keyframes ripple-animation {
+                    to {
+                        transform: scale(2);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(rippleStyles);
+        }
+
+        // Accessibility improvements (keeping original functionality)
+        function enhanceAccessibility() {
+            // Add skip to main content link
+            const skipLink = document.createElement('a');
+            skipLink.href = '#main-content';
+            skipLink.textContent = 'Skip to main content';
+            skipLink.style.cssText = `
+                position: absolute;
+                top: -40px;
+                left: 6px;
+                background: var(--accent-primary);
+                color: white;
+                padding: 8px;
+                text-decoration: none;
+                border-radius: 4px;
+                z-index: 10000;
+                transition: top 0.3s ease;
+            `;
+            skipLink.addEventListener('focus', () => {
+                skipLink.style.top = '6px';
+            });
+            skipLink.addEventListener('blur', () => {
+                skipLink.style.top = '-40px';
+            });
+            document.body.insertBefore(skipLink, document.body.firstChild);
+
+            // Add main landmark
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.setAttribute('role', 'main');
+                mainContent.setAttribute('id', 'main-content');
+            }
+        }
+
+        // Error handling and retry logic
+        function handleNetworkError(error, retryCallback, maxRetries = 3, currentRetry = 0) {
+            console.error(`Network error (attempt ${currentRetry + 1}/${maxRetries}):`, error);
+            
+            if (currentRetry < maxRetries - 1) {
+                const delay = Math.pow(2, currentRetry) * 1000; // Exponential backoff
+                setTimeout(() => {
+                    retryCallback(currentRetry + 1);
+                }, delay);
+            } else {
+                updateThemeIndicator({ name: 'Default (Offline)' });
+            }
+        }
+
+        // Initialize application
+        function initializeApp() {
+            // Check for reduced motion preference
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            if (prefersReducedMotion.matches) {
+                document.documentElement.style.setProperty('--animation-duration', '0s');
+            }
+
+            // Initialize accessibility enhancements
+            enhanceAccessibility();
+            
+            // Setup animations
+            setupInputAnimations();
+            setupButtonAnimations();
+
+            // Initialize theme and location handling
+            checkLocationPermission();
+
+            // Initialize the main page functionality
+            initializePage();
+        }
+
+        // Event listeners for modal and keyboard navigation
+        locationModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                dismissLocationModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (locationModal.style.display === 'flex') {
+                if (e.key === 'Escape') {
+                    dismissLocationModal();
+                } else if (e.key === 'Enter') {
+                    const focusedElement = document.activeElement;
+                    if (focusedElement.onclick) {
+                        focusedElement.click();
+                    }
+                }
+            }
+        });
+
+        // Page visibility handling for better performance
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                document.querySelectorAll('.status-icon').forEach(icon => {
+                    icon.style.animationPlayState = 'paused';
+                });
+            } else {
+                document.querySelectorAll('.status-icon').forEach(icon => {
+                    icon.style.animationPlayState = 'running';
+                });
+                
+                const lastThemeUpdate = sessionStorage.getItem('lastThemeUpdate');
+                if (lastThemeUpdate && Date.now() - parseInt(lastThemeUpdate) > 5 * 60 * 1000) {
+                    checkLocationPermission();
+                }
+            }
+        });
+
+        // Update last theme update timestamp
+        const originalApplyTheme = applyTheme;
+        applyTheme = function(theme) {
+            originalApplyTheme(theme);
+            sessionStorage.setItem('lastThemeUpdate', Date.now().toString());
+        };
+
+        // Handle browser back/forward navigation
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                const loadingIndicators = document.querySelectorAll('.loading-indicator');
+                loadingIndicators.forEach(indicator => {
+                    indicator.classList.remove('show');
+                });
+
+                const disabledButtons = document.querySelectorAll('.btn:disabled');
+                disabledButtons.forEach(btn => {
+                    if (!btn.dataset.permanentlyDisabled) {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    }
+                });
+            }
+        });
+
+        // Initialize the application when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+[static]
+  directory = "public"
+
+  [[static.routes]]
+    path = "/account/**"
+    destination = "/account.html"
+
+  [[static.routes]]
+    path = "/confirm-deletion"
+    destination = "/delete.html"
+
+  [[static.routes]]
+    path = "/privacy-terms"
+    destination = "/privacy-terms.html"
+
+  [[static.routes]]
+    path = "/auth/verify-device"
+    destination = "/verify-device.html"
+
+  [[static.routes]]
+    path = "/reset-password"
+    destination = "/reset-password.html"
+
+  [[static.routes]]
+    path = "/login"
+    destination = "/index.html"
+
+  [[static.routes]]
+    path = "/register"
+    destination = "/index.html"
+
+  [[static.routes]]
+    path = "/signup"
+    destination = "/index.html"
+
+  [[static.routes]]
+    path = "/forgot-password"
+    destination = "/index.html"
+
+  [[static.routes]]
+    path = "/verify-email"
+    destination = "/index.html"
+
+  [[static.routes]]
+    path = "/2fa"
+    destination = "/index.html"
+
+  [[static.routes]]
+    path = "/backup-code"
+    destination = "/index.html"
+
+  [[static.routes]]
+    path = "/*"
+    destination = "/404.html"

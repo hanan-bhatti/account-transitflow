@@ -1,0 +1,27 @@
+# Account dashboard routes (all go to account.html)
+/account/css/*        /account/css/:splat
+/account/js/*         /account/js/:splat
+/account/webfonts/*   /account/webfonts/:splat
+
+/account              /account.html
+/account/*            /account.html
+
+# Deletion confirm page
+/confirm-deletion       /delete.html
+
+# Static pages
+/privacy-terms          /privacy-terms.html
+/auth/verify-device          /verify-device.html
+/reset-password         /reset-password.html
+
+# Auth routes (all go to index.html)
+/login                  /index.html   200
+/register               /index.html   200
+/signup                 /index.html   200
+/forgot-password        /index.html   200
+/verify-email           /index.html   200
+/2fa                    /index.html   200
+/backup-code            /index.html   200
+
+# Default 404
+/*                      /404.html     404
