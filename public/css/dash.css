@@ -2775,6 +2775,7 @@ html {
   max-width: fit-content;
   padding: 24px;
   width: 100%;
+  z-index: 99998;
   max-height: 90vh;
   overflow-y: auto;
   animation: modalSlideIn 0.3s ease;
