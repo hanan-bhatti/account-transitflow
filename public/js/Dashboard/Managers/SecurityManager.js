@@ -270,7 +270,7 @@ class SecurityManager {
             const profileResponse = await this.dashboard.apiManager.makeRequest('/profile');
             const linkedAccounts = profileResponse.data?.socialAccounts || [];
 
-            this.renderSocialAccountsInterface(linkedAccounts, availableResponse.data, statsResponse.data);
+            this.renderSocialAccountsInterface(linkedAccounts, statsResponse.data);
 
         } catch (error) {
             console.error('Failed to load social accounts:', error);
@@ -278,11 +278,9 @@ class SecurityManager {
         }
     }
 
-    renderSocialAccountsInterface(linkedAccounts, availableData, statsData) {
+    renderSocialAccountsInterface(linkedAccounts, statsData) {
         const container = document.getElementById('socialAccounts');
         if (!container) return;
-
-        const availableProviders = availableData.availableProviders || [];
 
         // Filter for supported providers only
         const supportedProviders = ['google', 'github', 'facebook'];
@@ -290,16 +288,30 @@ class SecurityManager {
             supportedProviders.includes(account.provider) && account.isLinked
         );
 
+        // Render the parts that are still dynamic (linked accounts and stats)
         container.innerHTML = `
-        <div class="social-accounts-container">
-            ${this.renderLinkedAccounts(filteredLinked)}
-            ${this.renderAvailableProviders(availableProviders, filteredLinked)}
-            ${this.renderSocialStats(statsData)}
-        </div>
-    `;
+            <div class="social-accounts-container">
+                ${this.renderLinkedAccounts(filteredLinked)}
+                ${this.renderSocialStats(statsData)}
+            </div>
+        `;
+
+        const linkedProviderNames = filteredLinked.map(acc => acc.provider);
+        const providerButtons = document.querySelectorAll('#linkAccountSection .btn-social-provider');
+        let availableCount = 0;
+
+        providerButtons.forEach(button => {
+            const provider = button.dataset.provider;
+            if (linkedProviderNames.includes(provider)) {
+                button.style.display = 'none'; // Hide if account is already linked
+            } else {
+                button.style.display = 'inline-flex'; // Ensure it's visible if not linked
+                availableCount++;
+            }
+        });
 
         this.attachSocialEventListeners();
-        this.showLinkAccountSection(availableProviders.length > 0);
+        this.showLinkAccountSection(availableCount > 0);
     }
 
     renderLinkedAccounts(linkedAccounts) {
@@ -364,57 +376,6 @@ class SecurityManager {
     `;
     }
 
-    renderAvailableProviders(availableProviders, linkedAccounts) {
-        const supportedProviders = ['google', 'github', 'facebook'];
-        const linkedProviderNames = linkedAccounts.map(acc => acc.provider);
-
-        // Create available providers list based on what's not linked
-        const actuallyAvailable = supportedProviders
-            .filter(provider => !linkedProviderNames.includes(provider))
-            .map(provider => ({
-                provider,
-                name: this.getProviderConfig(provider).name,
-                configured: true // Assume configured since they're in your backend
-            }));
-
-        if (actuallyAvailable.length === 0) {
-            return `
-            <div class="available-providers-section">
-                <h4 class="section-title">Available Providers</h4>
-                <div class="no-providers">
-                    <i class="fas fa-check-circle text-success"></i>
-                    <p class="text-success mb-0">All supported accounts are linked</p>
-                </div>
-            </div>
-        `;
-        }
-
-        return `
-        <div class="available-providers-section">
-            <h4 class="section-title">Link New Account</h4>
-            <div class="providers-grid">
-                ${actuallyAvailable.map(provider => this.renderAvailableProvider(provider)).join('')}
-            </div>
-        </div>
-    `;
-    }
-
-    renderAvailableProvider(provider) {
-        const providerConfig = this.getProviderConfig(provider.provider);
-
-        return `
-        <div class="provider-card available" data-provider="${provider.provider}">
-            <div class="provider-icon ${provider.provider}">
-                <i class="${providerConfig.icon}"></i>
-            </div>
-            <span class="provider-name">${providerConfig.name}</span>
-            <button class="link-provider-btn" data-provider="${provider.provider}">
-                <i class="fas fa-plus"></i> Link
-            </button>
-        </div>
-    `;
-    }
-
     renderSocialStats(statsData) {
         if (!statsData || !statsData.security) return '';
 
@@ -468,6 +429,7 @@ class SecurityManager {
     }
 
     getRecommendationIcon(type) {
+        // ... this function remains unchanged
         const icons = {
             'security': 'fa-shield-alt',
             'convenience': 'fa-link',
@@ -477,6 +439,7 @@ class SecurityManager {
     }
 
     renderSocialAccountsError() {
+        // ... this function remains unchanged
         const container = document.getElementById('socialAccounts');
         if (container) {
             container.innerHTML = `
@@ -495,15 +458,20 @@ class SecurityManager {
     }
 
     showLinkAccountSection(hasAvailableProviders) {
+        // ... this function remains unchanged
         const linkSection = document.getElementById('linkAccountSection');
         const linkNewBtn = document.getElementById('linkNewAccountBtn');
 
         if (linkSection && linkNewBtn) {
             if (hasAvailableProviders) {
                 linkNewBtn.style.display = 'block';
-                this.addTrackedEventListener(linkNewBtn, 'click', () => {
-                    linkSection.style.display = linkSection.style.display === 'none' ? 'block' : 'none';
-                });
+                // Ensure listener is only added once or is idempotent
+                if (!linkNewBtn.dataset.listenerAttached) {
+                    this.addTrackedEventListener(linkNewBtn, 'click', () => {
+                        linkSection.style.display = linkSection.style.display === 'none' ? 'block' : 'none';
+                    });
+                    linkNewBtn.dataset.listenerAttached = 'true';
+                }
             } else {
                 linkNewBtn.style.display = 'none';
                 linkSection.style.display = 'none';
@@ -515,15 +483,7 @@ class SecurityManager {
         const container = document.getElementById('socialAccounts');
         if (!container) return;
 
-        // Link provider buttons in the main interface
-        container.querySelectorAll('.link-provider-btn').forEach(btn => {
-            this.addTrackedEventListener(btn, 'click', async (e) => {
-                const provider = btn.dataset.provider;
-                await this.linkSocialProvider(provider);
-            });
-        });
-
-        // Also handle buttons in the separate link section
+        // This now correctly targets the buttons in your static HTML
         const linkSection = document.getElementById('linkAccountSection');
         if (linkSection) {
             linkSection.querySelectorAll('.btn-social-provider').forEach(btn => {
@@ -560,95 +520,53 @@ class SecurityManager {
     }
 
     async linkSocialProvider(provider) {
+        // ... this function remains unchanged
         try {
             this.dashboard.loadingManager.showLoading(true);
-
-            // Use the correct OAuth endpoint from your backend
             const response = await this.dashboard.apiManager.makeRequest(`/oauth/${provider}`);
-
             if (response.data && response.data.authUrl) {
-                // Open OAuth flow in new window
-                const width = 600;
-                const height = 700;
+                const width = 600, height = 700;
                 const left = (window.screen.width / 2) - (width / 2);
                 const top = (window.screen.height / 2) - (height / 2);
-
-                const authWindow = window.open(
-                    response.data.authUrl,
-                    'socialAuth',
-                    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-                );
-
-                // Monitor for completion
+                const authWindow = window.open(response.data.authUrl, 'socialAuth', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
                 this.monitorAuthWindow(authWindow, provider);
             }
-
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Link Failed',
-                `Failed to initiate ${provider} linking: ${error.message}`);
+            this.dashboard.toastManager.showToast('error', 'Link Failed', `Failed to initiate ${provider} linking: ${error.message}`);
         } finally {
             this.dashboard.loadingManager.showLoading(false);
         }
     }
 
     async unlinkSocialProvider(provider) {
+        // ... this function remains unchanged
         const providerName = this.getProviderConfig(provider).name;
-
-        const confirmed = await this.dashboard.modalManager.showConfirm(
-            `Are you sure you want to unlink your ${providerName} account?`,
-            'This will remove access via this social account.'
-        );
-
+        const confirmed = await this.dashboard.modalManager.showConfirm(`Are you sure you want to unlink your ${providerName} account?`, 'This will remove access via this social account.');
         if (!confirmed) return;
-
         try {
             this.dashboard.loadingManager.showLoading(true);
-
-            // Your backend doesn't seem to have an unlink endpoint, so we'll need to handle this
-            // For now, show a message that this feature needs backend implementation
-            this.dashboard.toastManager.showToast('info', 'Feature Unavailable',
-                'Account unlinking feature needs to be implemented on the backend');
-
-            // If you add an unlink endpoint to your backend, use this:
-            // await this.dashboard.apiManager.makeRequest(`/social-accounts/${provider}`, {
-            //     method: 'DELETE'
-            // });
-
+            this.dashboard.toastManager.showToast('info', 'Feature Unavailable', 'Account unlinking feature needs to be implemented on the backend');
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Unlink Failed',
-                error.message || `Failed to unlink ${providerName} account`);
+            this.dashboard.toastManager.showToast('error', 'Unlink Failed', error.message || `Failed to unlink ${providerName} account`);
         } finally {
             this.dashboard.loadingManager.showLoading(false);
         }
     }
 
     async syncSocialProvider(provider) {
+        // ... this function remains unchanged
         const providerName = this.getProviderConfig(provider).name;
-
         try {
-            // Show syncing state
             const syncBtn = document.querySelector(`[data-provider="${provider}"].sync-account-btn`);
             if (syncBtn) {
                 syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 syncBtn.disabled = true;
             }
-
-            // Use the correct sync endpoint from your backend
-            const response = await this.dashboard.apiManager.makeRequest(`/social-accounts/sync/${provider}`, {
-                method: 'POST'
-            });
-
-            this.dashboard.toastManager.showToast('success', 'Account Synced',
-                `${providerName} account data has been synchronized`);
-
-            // Reload social accounts to show updated data
+            const response = await this.dashboard.apiManager.makeRequest(`/social-accounts/sync/${provider}`, { method: 'POST' });
+            this.dashboard.toastManager.showToast('success', 'Account Synced', `${providerName} account data has been synchronized`);
             await this.loadSocialAccounts();
-
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Sync Failed',
-                error.message || `Failed to sync ${providerName} account`);
-
-            // Reset button state on error
+            this.dashboard.toastManager.showToast('error', 'Sync Failed', error.message || `Failed to sync ${providerName} account`);
             const syncBtn = document.querySelector(`[data-provider="${provider}"].sync-account-btn`);
             if (syncBtn) {
                 syncBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
@@ -658,24 +576,20 @@ class SecurityManager {
     }
 
     monitorAuthWindow(authWindow, provider) {
+        // ... this function remains unchanged
         const checkClosed = setInterval(() => {
             if (authWindow.closed) {
                 clearInterval(checkClosed);
-
-                // Wait a moment for any redirects to complete, then reload
                 setTimeout(async () => {
                     try {
                         await this.loadSocialAccounts();
-                        this.dashboard.toastManager.showToast('success', 'Account Linked',
-                            `${this.getProviderConfig(provider).name} account linking completed`);
+                        this.dashboard.toastManager.showToast('success', 'Account Linked', `${this.getProviderConfig(provider).name} account linking completed`);
                     } catch (error) {
                         console.error('Failed to reload after linking:', error);
                     }
                 }, 2000);
             }
         }, 1000);
-
-        // Clean up if window doesn't close within 10 minutes
         setTimeout(() => {
             clearInterval(checkClosed);
             if (!authWindow.closed) {
@@ -685,19 +599,17 @@ class SecurityManager {
     }
 
     handleRecommendationAction(action, data) {
+        // ... this function remains unchanged
         switch (action) {
             case 'set_password':
-                this.dashboard.toastManager.showToast('info', 'Security Tip',
-                    'Consider setting a password for backup authentication');
+                this.dashboard.toastManager.showToast('info', 'Security Tip', 'Consider setting a password for backup authentication');
                 break;
-
             case 'link_accounts':
                 const availableSection = document.querySelector('.available-providers-section');
                 if (availableSection) {
                     availableSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
                 break;
-
             case 'sync_accounts':
                 if (data.providers) {
                     const providers = data.providers.split(',');
@@ -708,32 +620,15 @@ class SecurityManager {
     }
 
     getProviderConfig(provider) {
+        // ... this function remains unchanged
         const configs = {
-            google: {
-                name: 'Google',
-                icon: 'fab fa-google',
-                color: '#db4437'
-            },
-            github: {
-                name: 'GitHub',
-                icon: 'fab fa-github',
-                color: '#333333'
-            },
-            facebook: {
-                name: 'Facebook',
-                icon: 'fab fa-facebook-f',
-                color: '#4267b2'
-            }
+            google: { name: 'Google', icon: 'fab fa-google', color: '#db4437' },
+            github: { name: 'GitHub', icon: 'fab fa-github', color: '#333333' },
+            facebook: { name: 'Facebook', icon: 'fab fa-facebook-f', color: '#4267b2' }
         };
-
-        return configs[provider] || {
-            name: provider.charAt(0).toUpperCase() + provider.slice(1),
-            icon: 'fas fa-link',
-            color: '#6c757d'
-        };
+        return configs[provider] || { name: provider.charAt(0).toUpperCase() + provider.slice(1), icon: 'fas fa-link', color: '#6c757d' };
     }
 
-    // Keep existing unlinkSocial method for backward compatibility
     async unlinkSocial(provider) {
         return this.unlinkSocialProvider(provider);
     }

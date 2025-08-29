@@ -3409,6 +3409,9 @@ html {
   .settings-container {
     grid-template-columns: 1fr;
   }
+  .danger-actions {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
