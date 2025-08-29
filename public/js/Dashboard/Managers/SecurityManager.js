@@ -9,15 +9,15 @@ class SecurityManager {
     // Helper method to add tracked event listeners
     addTrackedEventListener(element, event, handler, options = {}) {
         if (!element) return;
-        
+
         const key = `${element.id || element.className}_${event}`;
-        
+
         // Remove existing listener if present
         if (this.eventListeners.has(key)) {
             const oldHandler = this.eventListeners.get(key);
             element.removeEventListener(event, oldHandler, options);
         }
-        
+
         element.addEventListener(event, handler, options);
         this.eventListeners.set(key, handler);
     }
@@ -138,7 +138,7 @@ class SecurityManager {
         const confirmed = await this.dashboard.modalManager.showConfirm(
             'Are you sure you want to cancel your account deletion request?'
         );
-        
+
         if (!confirmed) return;
 
         try {
@@ -149,7 +149,7 @@ class SecurityManager {
             });
 
             this.dashboard.toastManager.showToast('success', 'Success', 'Account deletion request cancelled successfully.');
-            
+
             // Reload deletion status to update UI
             await this.loadDeletionStatus();
 
@@ -160,7 +160,7 @@ class SecurityManager {
             }
 
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Error', 
+            this.dashboard.toastManager.showToast('error', 'Error',
                 error.message || 'Failed to cancel deletion request');
         } finally {
             this.dashboard.loadingManager.showLoading(false);
@@ -179,14 +179,14 @@ class SecurityManager {
                 body: JSON.stringify({ password })
             });
 
-            this.dashboard.toastManager.showToast('success', 'Deletion Requested', 
+            this.dashboard.toastManager.showToast('success', 'Deletion Requested',
                 'Please check your email for confirmation instructions. The link will expire in 24 hours.');
 
             // Reload deletion status to show pending state
             await this.loadDeletionStatus();
 
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Request Failed', 
+            this.dashboard.toastManager.showToast('error', 'Request Failed',
                 error.message || 'Failed to request account deletion');
         } finally {
             this.dashboard.loadingManager.showLoading(false);
@@ -202,15 +202,15 @@ class SecurityManager {
             setup2FABtn.disabled = true;
             setup2FABtn.style.cssText = 'cursor: not-allowed !important; opacity: 0.5 !important; pointer-events: all !important;';
             setup2FABtn.textContent = '2 Factor Authentication Enabled';
-            
+
             // Remove all hover effects by overriding hover styles
-            this.addTrackedEventListener(setup2FABtn, 'mouseenter', function(e) {
+            this.addTrackedEventListener(setup2FABtn, 'mouseenter', function (e) {
                 e.target.style.cssText = 'cursor: not-allowed !important; opacity: 0.5 !important; pointer-events: all !important; background-color: inherit !important; transform: none !important; box-shadow: none !important; border-color: inherit !important;';
             });
-            this.addTrackedEventListener(setup2FABtn, 'mouseleave', function(e) {
+            this.addTrackedEventListener(setup2FABtn, 'mouseleave', function (e) {
                 e.target.style.cssText = 'cursor: not-allowed !important; opacity: 0.5 !important; pointer-events: all !important; background-color: inherit !important; transform: none !important; box-shadow: none !important; border-color: inherit !important;';
             });
-            
+
             const StatusHeader = document.getElementById('twofaHeader');
             StatusHeader.textContent = 'Two-Factor Authentication Enabled';
             StatusHeader.classList.remove('twofaheader-disabled');
@@ -260,46 +260,456 @@ class SecurityManager {
 
     async loadSocialAccounts() {
         try {
-            const response = await this.dashboard.apiManager.makeRequest('/social-accounts');
-            const container = document.getElementById('socialAccounts');
+            // Load both linked accounts and available providers
+            const [accountsResponse, availableResponse, statsResponse] = await Promise.all([
+                this.dashboard.apiManager.makeRequest('/social-accounts'),
+                this.dashboard.apiManager.makeRequest('/social-accounts/available'),
+                this.dashboard.apiManager.makeRequest('/social-accounts/stats')
+            ]);
 
-            if (response.data.socialAccounts.length === 0) {
-                container.innerHTML = '<p class="text-center">No social accounts linked</p>';
-                return;
-            }
-
-            const accountsHtml = response.data.socialAccounts.map(account => `
-                <div class="social-account">
-                    <div class="social-account-info">
-                        <div class="social-icon ${account.provider}">
-                            <i class="fab fa-${account.provider}"></i>
-                        </div>
-                        <div>
-                            <h4>${account.displayName}</h4>
-                            <p>${account.email}</p>
-                        </div>
-                    </div>
-                    <button class="btn btn-danger btn-sm unlink-social-btn" data-provider="${account.provider}">
-                        Unlink
-                    </button>
-                </div>
-            `).join('');
-
-            container.innerHTML = accountsHtml;
-
-            // Attach event listeners to dynamically created elements
-            container.querySelectorAll('.unlink-social-btn').forEach(button => {
-                this.addTrackedEventListener(button, 'click', () => {
-                    const provider = button.dataset.provider;
-                    this.unlinkSocial(provider);
-                });
-            });
+            this.renderSocialAccountsInterface(accountsResponse.data, availableResponse.data, statsResponse.data);
 
         } catch (error) {
-            document.getElementById('socialAccounts').innerHTML =
-                '<p class="text-center">Error loading social accounts</p>';
-            this.dashboard.toastManager.showToast('error', 'Error', 'Failed to load social accounts');
+            console.error('Failed to load social accounts:', error);
+            this.renderSocialAccountsError();
         }
+    }
+
+    renderSocialAccountsInterface(accountsData, availableData, statsData) {
+        const container = document.getElementById('socialAccounts');
+        if (!container) return;
+
+        const linkedAccounts = accountsData.socialAccounts || [];
+        const availableProviders = availableData.availableProviders || [];
+
+        // Filter for our supported providers only
+        const supportedProviders = ['google', 'github', 'facebook'];
+        const filteredLinked = linkedAccounts.filter(account =>
+            supportedProviders.includes(account.provider)
+        );
+        const filteredAvailable = availableProviders.filter(provider =>
+            supportedProviders.includes(provider.provider)
+        );
+
+        container.innerHTML = `
+        <div class="social-accounts-container">
+            ${this.renderLinkedAccounts(filteredLinked)}
+            ${this.renderAvailableProviders(filteredAvailable)}
+            ${this.renderSocialStats(statsData)}
+        </div>
+    `;
+
+        this.attachSocialEventListeners();
+    }
+
+    renderLinkedAccounts(linkedAccounts) {
+        if (linkedAccounts.length === 0) {
+            return `
+            <div class="linked-accounts-section">
+                <h4 class="section-title">Linked Accounts</h4>
+                <div class="no-accounts">
+                    <i class="fas fa-link text-muted"></i>
+                    <p class="text-muted mb-0">No social accounts linked yet</p>
+                </div>
+            </div>
+        `;
+        }
+
+        return `
+        <div class="linked-accounts-section">
+            <h4 class="section-title">Linked Accounts</h4>
+            <div class="social-accounts-grid">
+                ${linkedAccounts.map(account => this.renderLinkedAccount(account)).join('')}
+            </div>
+        </div>
+    `;
+    }
+
+    renderLinkedAccount(account) {
+        const providerConfig = this.getProviderConfig(account.provider);
+        const lastSync = account.lastSync ? new Date(account.lastSync).toLocaleDateString() : 'Never';
+        const isStale = account.lastSync && (Date.now() - new Date(account.lastSync).getTime()) > (30 * 24 * 60 * 60 * 1000);
+
+        return `
+        <div class="social-account-card" data-provider="${account.provider}">
+            <div class="account-header">
+                <div class="provider-icon ${account.provider}">
+                    <i class="${providerConfig.icon}"></i>
+                </div>
+                <div class="account-info">
+                    <h5 class="provider-name">${providerConfig.name}</h5>
+                    <p class="account-email">${account.email || 'No email'}</p>
+                </div>
+                <div class="account-actions">
+                    <button class="btn-icon sync-account-btn" 
+                            data-provider="${account.provider}" 
+                            title="Sync account data">
+                        <i class="fas fa-sync-alt ${isStale ? 'text-warning' : ''}"></i>
+                    </button>
+                    <button class="btn-icon unlink-account-btn" 
+                            data-provider="${account.provider}" 
+                            title="Unlink account">
+                        <i class="fas fa-unlink text-danger"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="account-meta">
+                <small class="text-muted">
+                    <i class="fas fa-clock"></i>
+                    Last synced: ${lastSync}
+                    ${isStale ? '<span class="text-warning"> (Outdated)</span>' : ''}
+                </small>
+            </div>
+        </div>
+    `;
+    }
+
+    renderAvailableProviders(availableProviders) {
+        if (availableProviders.length === 0) {
+            return `
+            <div class="available-providers-section">
+                <h4 class="section-title">Available Providers</h4>
+                <div class="no-providers">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <p class="text-success mb-0">All supported accounts are linked</p>
+                </div>
+            </div>
+        `;
+        }
+
+        return `
+        <div class="available-providers-section">
+            <h4 class="section-title">Link New Account</h4>
+            <div class="providers-grid">
+                ${availableProviders.map(provider => this.renderAvailableProvider(provider)).join('')}
+            </div>
+        </div>
+    `;
+    }
+
+    renderAvailableProvider(provider) {
+        const providerConfig = this.getProviderConfig(provider.provider);
+
+        if (!provider.configured) {
+            return `
+            <div class="provider-card disabled">
+                <div class="provider-icon ${provider.provider}">
+                    <i class="${providerConfig.icon}"></i>
+                </div>
+                <span class="provider-name">${providerConfig.name}</span>
+                <span class="status-badge disabled">Not Available</span>
+            </div>
+        `;
+        }
+
+        return `
+        <div class="provider-card available" data-provider="${provider.provider}">
+            <div class="provider-icon ${provider.provider}">
+                <i class="${providerConfig.icon}"></i>
+            </div>
+            <span class="provider-name">${providerConfig.name}</span>
+            <button class="link-provider-btn" data-provider="${provider.provider}">
+                <i class="fas fa-plus"></i> Link
+            </button>
+        </div>
+    `;
+    }
+
+    renderSocialStats(statsData) {
+        if (!statsData || !statsData.security) return '';
+
+        const { security, recommendations } = statsData;
+        const hasRecommendations = recommendations && recommendations.length > 0;
+
+        return `
+        <div class="social-stats-section ${hasRecommendations ? 'has-recommendations' : ''}">
+            <div class="stats-header">
+                <h4 class="section-title">Security Overview</h4>
+                <div class="auth-methods-count">
+                    <span class="badge ${security.totalAuthMethods >= 2 ? 'badge-success' : 'badge-warning'}">
+                        ${security.totalAuthMethods} auth method${security.totalAuthMethods !== 1 ? 's' : ''}
+                    </span>
+                </div>
+            </div>
+            ${hasRecommendations ? this.renderRecommendations(recommendations) : ''}
+        </div>
+    `;
+    }
+
+    renderRecommendations(recommendations) {
+        return `
+        <div class="recommendations-list">
+            ${recommendations.map(rec => `
+                <div class="recommendation-item ${rec.priority}">
+                    <div class="rec-icon">
+                        <i class="fas ${this.getRecommendationIcon(rec.type)}"></i>
+                    </div>
+                    <div class="rec-content">
+                        <p class="rec-message">${rec.message}</p>
+                        ${rec.action ? this.renderRecommendationAction(rec) : ''}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    }
+
+    renderRecommendationAction(rec) {
+        switch (rec.action) {
+            case 'set_password':
+                return '<button class="btn-sm btn-outline-primary rec-action-btn" data-action="set_password">Set Password</button>';
+            case 'link_more_accounts':
+                return '<button class="btn-sm btn-outline-info rec-action-btn" data-action="link_accounts">Link Accounts</button>';
+            case 'sync_accounts':
+                return `<button class="btn-sm btn-outline-warning rec-action-btn" data-action="sync_accounts" data-providers="${rec.providers?.join(',')}">Sync Accounts</button>`;
+            default:
+                return '';
+        }
+    }
+
+    getRecommendationIcon(type) {
+        const icons = {
+            'security': 'fa-shield-alt',
+            'convenience': 'fa-link',
+            'maintenance': 'fa-sync-alt'
+        };
+        return icons[type] || 'fa-info-circle';
+    }
+
+    renderSocialAccountsError() {
+        const container = document.getElementById('socialAccounts');
+        if (container) {
+            container.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle text-warning"></i>
+                <p class="text-muted">Failed to load social accounts</p>
+                <button class="btn btn-sm btn-outline-primary retry-load-btn">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+        `;
+
+            const retryBtn = container.querySelector('.retry-load-btn');
+            this.addTrackedEventListener(retryBtn, 'click', () => this.loadSocialAccounts());
+        }
+    }
+
+    attachSocialEventListeners() {
+        const container = document.getElementById('socialAccounts');
+        if (!container) return;
+
+        // Link provider buttons
+        container.querySelectorAll('.link-provider-btn').forEach(btn => {
+            this.addTrackedEventListener(btn, 'click', async (e) => {
+                const provider = btn.dataset.provider;
+                await this.linkSocialProvider(provider);
+            });
+        });
+
+        // Unlink account buttons
+        container.querySelectorAll('.unlink-account-btn').forEach(btn => {
+            this.addTrackedEventListener(btn, 'click', async (e) => {
+                const provider = btn.dataset.provider;
+                await this.unlinkSocialProvider(provider);
+            });
+        });
+
+        // Sync account buttons
+        container.querySelectorAll('.sync-account-btn').forEach(btn => {
+            this.addTrackedEventListener(btn, 'click', async (e) => {
+                const provider = btn.dataset.provider;
+                await this.syncSocialProvider(provider);
+            });
+        });
+
+        // Recommendation action buttons
+        container.querySelectorAll('.rec-action-btn').forEach(btn => {
+            this.addTrackedEventListener(btn, 'click', (e) => {
+                const action = btn.dataset.action;
+                this.handleRecommendationAction(action, btn.dataset);
+            });
+        });
+    }
+
+    async linkSocialProvider(provider) {
+        try {
+            this.dashboard.loadingManager.showLoading(true);
+
+            // Get OAuth URL for linking
+            const response = await this.dashboard.apiManager.makeRequest(`/oauth/${provider}`);
+
+            if (response.data && response.data.authUrl) {
+                // Open OAuth flow in new window
+                const width = 600;
+                const height = 700;
+                const left = (window.screen.width / 2) - (width / 2);
+                const top = (window.screen.height / 2) - (height / 2);
+
+                const authWindow = window.open(
+                    response.data.authUrl,
+                    'socialAuth',
+                    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                );
+
+                // Monitor for completion
+                this.monitorAuthWindow(authWindow, provider);
+            }
+
+        } catch (error) {
+            this.dashboard.toastManager.showToast('error', 'Link Failed',
+                `Failed to initiate ${provider} linking: ${error.message}`);
+        } finally {
+            this.dashboard.loadingManager.showLoading(false);
+        }
+    }
+
+    async unlinkSocialProvider(provider) {
+        const providerName = this.getProviderConfig(provider).name;
+
+        const confirmed = await this.dashboard.modalManager.showConfirm(
+            `Are you sure you want to unlink your ${providerName} account?`,
+            'This will remove access via this social account.'
+        );
+
+        if (!confirmed) return;
+
+        try {
+            this.dashboard.loadingManager.showLoading(true);
+
+            await this.dashboard.apiManager.makeRequest(`/social-accounts/${provider}`, {
+                method: 'DELETE'
+            });
+
+            this.dashboard.toastManager.showToast('success', 'Account Unlinked',
+                `${providerName} account has been unlinked successfully`);
+
+            // Reload social accounts
+            await this.loadSocialAccounts();
+
+        } catch (error) {
+            this.dashboard.toastManager.showToast('error', 'Unlink Failed',
+                error.message || `Failed to unlink ${providerName} account`);
+        } finally {
+            this.dashboard.loadingManager.showLoading(false);
+        }
+    }
+
+    async syncSocialProvider(provider) {
+        const providerName = this.getProviderConfig(provider).name;
+
+        try {
+            // Show syncing state
+            const syncBtn = document.querySelector(`[data-provider="${provider}"].sync-account-btn`);
+            if (syncBtn) {
+                syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                syncBtn.disabled = true;
+            }
+
+            const response = await this.dashboard.apiManager.makeRequest(`/social-accounts/sync/${provider}`, {
+                method: 'POST'
+            });
+
+            this.dashboard.toastManager.showToast('success', 'Account Synced',
+                `${providerName} account data has been synchronized`);
+
+            // Reload social accounts to show updated data
+            await this.loadSocialAccounts();
+
+        } catch (error) {
+            this.dashboard.toastManager.showToast('error', 'Sync Failed',
+                error.message || `Failed to sync ${providerName} account`);
+
+            // Reset button state on error
+            const syncBtn = document.querySelector(`[data-provider="${provider}"].sync-account-btn`);
+            if (syncBtn) {
+                syncBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                syncBtn.disabled = false;
+            }
+        }
+    }
+
+    monitorAuthWindow(authWindow, provider) {
+        const checkClosed = setInterval(() => {
+            if (authWindow.closed) {
+                clearInterval(checkClosed);
+
+                // Wait a moment for any redirects to complete, then reload
+                setTimeout(async () => {
+                    try {
+                        await this.loadSocialAccounts();
+                        this.dashboard.toastManager.showToast('info', 'Checking Status',
+                            'Checking account linking status...');
+                    } catch (error) {
+                        // Silent fail - user might have cancelled
+                    }
+                }, 1000);
+            }
+        }, 1000);
+
+        // Clean up if window doesn't close within 10 minutes
+        setTimeout(() => {
+            clearInterval(checkClosed);
+            if (!authWindow.closed) {
+                authWindow.close();
+            }
+        }, 600000);
+    }
+
+    handleRecommendationAction(action, data) {
+        switch (action) {
+            case 'set_password':
+                // Navigate to password settings or show password setup modal
+                this.dashboard.toastManager.showToast('info', 'Security Tip',
+                    'Consider setting a password for backup authentication');
+                break;
+
+            case 'link_accounts':
+                // Scroll to available providers section
+                const availableSection = document.querySelector('.available-providers-section');
+                if (availableSection) {
+                    availableSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                break;
+
+            case 'sync_accounts':
+                // Sync all recommended accounts
+                if (data.providers) {
+                    const providers = data.providers.split(',');
+                    providers.forEach(provider => this.syncSocialProvider(provider));
+                }
+                break;
+        }
+    }
+
+    getProviderConfig(provider) {
+        const configs = {
+            google: {
+                name: 'Google',
+                icon: 'fab fa-google',
+                color: '#db4437'
+            },
+            github: {
+                name: 'GitHub',
+                icon: 'fab fa-github',
+                color: '#333333'
+            },
+            facebook: {
+                name: 'Facebook',
+                icon: 'fab fa-facebook-f',
+                color: '#4267b2'
+            }
+        };
+
+        return configs[provider] || {
+            name: provider.charAt(0).toUpperCase() + provider.slice(1),
+            icon: 'fas fa-link',
+            color: '#6c757d'
+        };
+    }
+
+    // Keep existing unlinkSocial method for backward compatibility
+    async unlinkSocial(provider) {
+        return this.unlinkSocialProvider(provider);
     }
 
     async requestAccountDeletion() {
@@ -320,7 +730,7 @@ class SecurityManager {
         const inputHandler = () => {
             const typed = confirmTextInput.value.trim().toUpperCase();
             const required = 'DELETE MY ACCOUNT';
-            
+
             if (required === typed) {
                 confirmButton.disabled = false;
                 confirmButton.style.opacity = '1';
@@ -385,7 +795,7 @@ class SecurityManager {
             });
 
             this.dashboard.modalManager.hideModal('accountDeletionModal');
-            this.dashboard.toastManager.showToast('success', 'Account Deleted', 
+            this.dashboard.toastManager.showToast('success', 'Account Deleted',
                 'Your account has been successfully deleted. You will be redirected shortly.');
 
             // Clear any stored auth data and redirect after delay
@@ -393,19 +803,19 @@ class SecurityManager {
                 // Clear all storage
                 localStorage.clear();
                 sessionStorage.clear();
-                
+
                 // Clear all cookies
                 document.cookie.split(";").forEach(cookie => {
                     const eqPos = cookie.indexOf("=");
                     const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
                     document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;";
                 });
-                
+
                 window.location.href = '/';
             }, 3000);
 
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Deletion Failed', 
+            this.dashboard.toastManager.showToast('error', 'Deletion Failed',
                 error.message || 'Failed to delete account');
         } finally {
             this.dashboard.loadingManager.showLoading(false);
@@ -509,7 +919,7 @@ class SecurityManager {
                 placeholder: 'Enter your password',
                 required: true,
                 confirmButtonText: 'Confirm Delete',
-                confirmButtonColor : '#dc3545'
+                confirmButtonColor: '#dc3545'
             }
         );
     }
@@ -633,7 +1043,7 @@ class SecurityManager {
                 <i class="fas fa-shield-alt"></i> Enable 2FA
             </button>`
                 );
-                
+
                 const enableBtn = document.getElementById('enable2FAFromBackup');
                 this.addTrackedEventListener(enableBtn, 'click', () => this.setup2FA());
                 return;
@@ -709,7 +1119,7 @@ class SecurityManager {
                 <i class="fas fa-key"></i> Verify 2FA
             </button>`
                 );
-                
+
                 const verifyBtn = document.getElementById('verify2FAFromBackup');
                 this.addTrackedEventListener(verifyBtn, 'click', () => this.show2FAVerification());
             } else if (error.message.includes('2FA is not enabled')) {
@@ -719,7 +1129,7 @@ class SecurityManager {
                 <i class="fas fa-shield-alt"></i> Enable 2FA
             </button>`
                 );
-                
+
                 const enableBtn = document.getElementById('enable2FAFromError');
                 this.addTrackedEventListener(enableBtn, 'click', () => this.setup2FA());
             } else {
@@ -729,7 +1139,7 @@ class SecurityManager {
                 <i class="fas fa-redo"></i> Retry
             </button>`
                 );
-                
+
                 const retryBtn = document.getElementById('retryLoadBackupCodes');
                 this.addTrackedEventListener(retryBtn, 'click', () => this.loadBackupCodes());
                 this.dashboard.toastManager.showToast('error', 'Error', 'Failed to load backup codes');
