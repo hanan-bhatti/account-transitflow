@@ -669,7 +669,6 @@ body {
     gap: 0.5rem;
     padding: 0.75rem 1rem;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
     background: var(--bg-primary);
     color: var(--text-primary);
     font-size: 0.875rem;
@@ -680,6 +679,7 @@ body {
 }
 
 .btn-social:hover {
+  border-radius: 100px;
     background: var(--bg-secondary);
     border-color: var(--primary-color);
     transform: translateY(-1px);

@@ -3976,7 +3976,8 @@ textarea:focus {
 }
 
 .link-account-section {
-  margin-top: 1.5rem;
+  padding: 25px;
+  padding-top: 0;
 }
 
 .link-account-section h4 {
