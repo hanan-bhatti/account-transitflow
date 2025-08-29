@@ -2140,9 +2140,9 @@ class ThemeManager {
         display: flex;
       }
       .modal-overlay { 
-        background: rgba(0,0,0,0.7); 
-        backdrop-filter: blur(5px); 
-        position: absolute; 
+        background: var(--bg-overlay);
+        backdrop-filter: blur(5px);
+        z-index: 99998;
         inset: 0; 
       }
       .modal-content {
