@@ -620,7 +620,6 @@ class SecurityManager {
     }
 
     getProviderConfig(provider) {
-        // ... this function remains unchanged
         const configs = {
             google: { name: 'Google', icon: 'fab fa-google', color: '#db4437' },
             github: { name: 'GitHub', icon: 'fab fa-github', color: '#333333' },
