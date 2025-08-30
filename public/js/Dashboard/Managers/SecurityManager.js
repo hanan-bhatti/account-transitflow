@@ -179,8 +179,28 @@ class SecurityManager {
                 body: JSON.stringify({ password })
             });
 
-            this.dashboard.toastManager.showToast('success', 'Deletion Requested',
-                'Please check your email for confirmation instructions. The link will expire in 24 hours.');
+            // Check if there's already a pending deletion request
+            if (response.data && response.data.deletionRequestedAt) {
+                // Calculate when user can request new deletion
+                const expirationDate = new Date(response.data.deletionTokenExpires);
+                const now = new Date();
+                const timeRemaining = expirationDate - now;
+
+                let timeMessage = '';
+                if (timeRemaining > 0) {
+                    const hoursRemaining = Math.ceil(timeRemaining / (1000 * 60 * 60));
+                    timeMessage = ` You can request a new deletion in ${hoursRemaining} hour${hoursRemaining !== 1 ? 's' : ''}.`;
+                } else {
+                    timeMessage = ' You can request a new deletion now.';
+                }
+
+                this.dashboard.toastManager.showToast('error', 'Deletion Already Pending',
+                    response.message + timeMessage);
+            } else {
+                // Normal success case
+                this.dashboard.toastManager.showToast('success', 'Deletion Requested',
+                    'Please check your email for confirmation instructions. The link will expire in 24 hours.');
+            }
 
             // Reload deletion status to show pending state
             await this.loadDeletionStatus();
@@ -1538,20 +1558,6 @@ class SecurityManager {
 
         } catch (error) {
             this.dashboard.toastManager.showToast('error', 'Error', 'Failed to disable 2FA');
-        }
-    }
-
-    async unlinkSocial(provider) {
-        if (!await this.dashboard.modalManager.showConfirm(`Are you sure you want to unlink your ${provider} account?`)) {
-            return;
-        }
-
-        try {
-            await this.dashboard.apiManager.makeRequest(`/social-accounts/${provider}`, { method: 'DELETE' });
-            await this.loadSocialAccounts();
-            this.dashboard.toastManager.showToast('success', 'Success', `${provider} account unlinked`);
-        } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Error', `Failed to unlink ${provider} account`);
         }
     }
 

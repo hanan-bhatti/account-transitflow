@@ -308,7 +308,8 @@ class UserManager {
                 method: 'PUT',
                 body: JSON.stringify({
                     currentPassword,
-                    newPassword
+                    newPassword,
+                    confirmPassword
                 })
             });
 
@@ -469,7 +470,6 @@ class UserManager {
         }
     }
 
-// Improved exportData method for UserManager.js
 async exportData() {
     try {
         this.dashboard.loadingManager.showLoading(true);
@@ -499,7 +499,6 @@ async exportData() {
         } catch (apiError) {
             console.warn('API export failed, using fallback method:', apiError);
             
-            // Fallback: Create export from current user data
             exportData = {
                 exportDate: new Date().toISOString(),
                 exportVersion: '1.0-fallback',

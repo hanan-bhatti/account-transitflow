@@ -962,10 +962,10 @@ class NavigationManager {
                 this.navigateToSubsection('security', 'change-password');
                 break;
             case 'setup-2fa':
-                this.navigateToSubsection('security', 'two-factor');
+                this.loadSectionData('security');
                 break;
             case 'export-data':
-                this.navigateToSubsection('settings', 'export-data');
+                this.loadSectionData('settings');
                 break;
             case 'update-location':
                 this.navigateToSubsection('profile', 'location');
