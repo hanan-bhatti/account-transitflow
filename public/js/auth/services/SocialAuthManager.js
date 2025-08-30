@@ -2,7 +2,7 @@
 class SocialAuthManager {
     constructor(config = {}) {
         this.config = {
-            apiBaseUrl: 'https://api-auth.transitflow.qzz.io/api/users',
+            apiBbaseUrl_social: 'https://api-auth.transitflow.qzz.io/api/users',
             frontendBaseUrl: 'https://account.transitflow.qzz.io',
             popupWidth: 500,
             popupHeight: 600,
@@ -184,7 +184,7 @@ class SocialAuthManager {
         }
 
         const queryString = params.toString() ? '?' + params.toString() : '';
-        const url = `${this.config.apiBaseUrl}/social/${provider}${queryString}`;
+        const url = `${this.config.apiBbaseUrl_social}/social/${provider}${queryString}`;
         
         try {
             const response = await fetch(url, {
