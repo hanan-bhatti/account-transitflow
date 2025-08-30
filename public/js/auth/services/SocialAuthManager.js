@@ -2,7 +2,7 @@
 class SocialAuthManager {
     constructor(config = {}) {
         this.config = {
-            apiBaseUrl: 'https://api-auth.transitflow.qzz.io/api/auth/social/social',
+            apiBaseurl_social: 'https://api-auth.transitflow.qzz.io/api/users/social/',
             redirectUri: 'https://account.transitflow.qzz.io/account',
             popupWidth: 500,
             popupHeight: 600,
@@ -238,7 +238,7 @@ class SocialAuthManager {
         }
 
         const queryString = params.toString() ? '?' + params.toString() : '';
-        const url = `${this.config.apiBaseUrl}/social/${provider}${queryString}`;
+        const url = `${this.config.apiBaseurl_social}/social/${provider}${queryString}`;
         
         try {
             const response = await fetch(url, {
@@ -640,14 +640,14 @@ class SocialAuthManager {
     // Public API methods for external integration
     getLinkedAccounts(userId) {
         // This would typically fetch from your API
-        return fetch(`${this.config.apiBaseUrl}/social/linked-accounts/${userId}`, {
+        return fetch(`${this.config.apiBaseurl_social}/social/linked-accounts/${userId}`, {
             credentials: 'include'
         }).then(response => response.json());
     }
 
     async unlinkAccount(provider) {
         try {
-            const response = await fetch(`${this.config.apiBaseUrl}/social/unlink`, {
+            const response = await fetch(`${this.config.apiBaseurl_social}/social/unlink`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
