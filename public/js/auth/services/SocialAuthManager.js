@@ -2,8 +2,8 @@
 class SocialAuthManager {
     constructor(config = {}) {
         this.config = {
-            apiBaseurl_social: 'https://api-auth.transitflow.qzz.io/api/users/social/',
-            redirectUri: 'https://account.transitflow.qzz.io/account',
+            apiBaseUrl: 'https://api-auth.transitflow.qzz.io/api/users',
+            frontendBaseUrl: 'https://account.transitflow.qzz.io',
             popupWidth: 500,
             popupHeight: 600,
             popupTimeout: 300000, // 5 minutes
@@ -19,10 +19,9 @@ class SocialAuthManager {
         this.popupWindow = null;
         this.pollTimer = null;
         this.currentProvider = null;
-        this.linkingMode = false;
         this.retryCount = 0;
         
-        this.supportedProviders = ['google', 'facebook', 'github'];
+        this.supportedProviders = ['google', 'facebook', 'apple', 'github', 'twitter', 'linkedin'];
         this.providerConfig = {
             google: {
                 name: 'Google',
@@ -34,13 +33,27 @@ class SocialAuthManager {
                 color: '#4267B2',
                 icon: 'bxl-facebook'
             },
+            apple: {
+                name: 'Apple',
+                color: '#000000',
+                icon: 'bxl-apple'
+            },
             github: {
                 name: 'GitHub',
-                color: '#333',
+                color: '#333333',
                 icon: 'bxl-github'
+            },
+            twitter: {
+                name: 'Twitter',
+                color: '#1DA1F2',
+                icon: 'bxl-twitter'
+            },
+            linkedin: {
+                name: 'LinkedIn',
+                color: '#0077B5',
+                icon: 'bxl-linkedin'
             }
         };
-
     }
 
     // Initialization method
@@ -49,11 +62,8 @@ class SocialAuthManager {
         this.uiManager = uiManager;
         this.networkManager = networkManager;
         
-        // Bind methods to preserve context after dependencies are set
-        console.log("DEBUG SocialAuthManager.initialize binding:", this.config.login);
-
+        // Bind methods to preserve context
         this.handleLogin = this.handleLogin.bind(this);
-        this.handleLink = this.handleLink.bind(this);
         this.handlePopupMessage = this.handlePopupMessage.bind(this);
         
         this.setupEventListeners();
@@ -64,7 +74,7 @@ class SocialAuthManager {
 
     // Setup event listeners for social login buttons
     setupEventListeners() {
-        // Listen for popup messages
+        // Listen for postMessage from OAuth popup
         window.addEventListener('message', this.handlePopupMessage);
 
         // Setup social login buttons
@@ -74,15 +84,6 @@ class SocialAuthManager {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
                     this.handleLogin(provider);
-                });
-            }
-
-            // Also handle dynamic buttons (for account linking)
-            const linkButton = document.getElementById(`link-${provider}`);
-            if (linkButton) {
-                linkButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.handleLink(provider);
                 });
             }
         });
@@ -98,7 +99,7 @@ class SocialAuthManager {
                 // User switched tabs, show a toast reminder
                 setTimeout(() => {
                     if (this.popupWindow && !this.popupWindow.closed) {
-                        this.uiManager.showToast(
+                        this.uiManager?.showToast(
                             'Please complete the authentication in the popup window',
                             'info'
                         );
@@ -108,25 +109,21 @@ class SocialAuthManager {
         });
     }
 
-    // Handle URL parameters for OAuth redirects
+    // Handle URL parameters for OAuth error redirects
     handleUrlParameters() {
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
-        const provider = urlParams.get('provider');
-        const loginMethod = urlParams.get('loginMethod');
+        const code = urlParams.get('code');
 
-        if (error && provider) {
+        if (error) {
             setTimeout(() => {
-                this.handleOAuthError(error, provider);
+                this.handleUrlError(error);
                 this.cleanupUrl();
             }, 500);
-        } else if (loginMethod === 'social' && provider) {
-            // Successful OAuth login redirect
+        } else if (code) {
+            // URL callback should not happen with popup flow, but handle gracefully
             setTimeout(() => {
-                this.uiManager.showToast(
-                    `Successfully logged in with ${this.getProviderName(provider)}!`,
-                    'success'
-                );
+                this.uiManager?.showToast('Login completed successfully!', 'success');
                 this.cleanupUrl();
             }, 500);
         }
@@ -138,8 +135,8 @@ class SocialAuthManager {
             return;
         }
 
-        if (!this.networkManager.isOnline) {
-            this.uiManager.showToast(
+        if (!this.networkManager?.isOnline) {
+            this.uiManager?.showToast(
                 'No internet connection. Please check your network and try again.',
                 'error'
             );
@@ -148,12 +145,11 @@ class SocialAuthManager {
 
         try {
             this.currentProvider = provider;
-            this.linkingMode = false;
             this.retryCount = 0;
 
             // Show loading state
             this.setButtonLoading(provider, true);
-            this.uiManager.showToast(
+            this.uiManager?.showToast(
                 `Connecting to ${this.getProviderName(provider)}...`,
                 'info'
             );
@@ -166,7 +162,7 @@ class SocialAuthManager {
             }
 
             // Open popup and start authentication flow
-            await this.openPopupAndAuthenticate(authData.authUrl, authData.state);
+            await this.openPopupAndAuthenticate(authData.authUrl);
 
         } catch (error) {
             console.error(`${provider} login error:`, error);
@@ -176,69 +172,19 @@ class SocialAuthManager {
         }
     }
 
-    // Handle social account linking (for authenticated users)
-    async handleLink(provider, options = {}) {
-        if (!this.validateProvider(provider)) {
-            return;
-        }
-
-        if (!this.authManager.currentUser) {
-            this.uiManager.showToast('You must be logged in to link accounts', 'error');
-            return;
-        }
-
-        if (!this.networkManager.isOnline) {
-            this.uiManager.showToast(
-                'No internet connection. Please check your network and try again.',
-                'error'
-            );
-            return;
-        }
-
-        try {
-            this.currentProvider = provider;
-            this.linkingMode = true;
-            this.retryCount = 0;
-
-            // Show loading state
-            this.setButtonLoading(provider, true, 'link');
-            this.uiManager.showToast(
-                `Connecting to ${this.getProviderName(provider)} for account linking...`,
-                'info'
-            );
-
-            // Get OAuth URL for linking
-            const authData = await this.getOAuthUrl(provider, options.redirectUri, true);
-
-            if (!authData.authUrl) {
-                throw new Error('Failed to get OAuth URL for linking');
-            }
-
-            // Open popup and start linking flow
-            await this.openPopupAndAuthenticate(authData.authUrl, authData.state);
-
-        } catch (error) {
-            console.error(`${provider} linking error:`, error);
-            this.handleSocialError(error, provider, true);
-        } finally {
-            this.setButtonLoading(provider, false, 'link');
-        }
-    }
-
-    // Get OAuth URL from backend
-    async getOAuthUrl(provider, redirectUri = null, isLinking = false) {
+    // Get OAuth URL from backend (login only)
+    async getOAuthUrl(provider, redirectUri = null) {
         const params = new URLSearchParams();
+        
+        // Always set action to login (default behavior)
+        params.append('action', 'login');
         
         if (redirectUri) {
             params.append('redirect_uri', redirectUri);
         }
-        
-        if (isLinking) {
-            params.append('action', 'link');
-        }
 
         const queryString = params.toString() ? '?' + params.toString() : '';
-        const url = `${this.config.apiBaseurl_social}/social/${provider}${queryString}`;
+        const url = `${this.config.apiBaseUrl}/social/${provider}${queryString}`;
         
         try {
             const response = await fetch(url, {
@@ -252,32 +198,32 @@ class SocialAuthManager {
 
             if (!response.ok) {
                 const errorData = await this.parseErrorResponse(response);
-                throw new Error(errorData.message || `Failed to get ${provider} OAuth URL`);
+                throw new Error(errorData.message || errorData.error || `Failed to get ${provider} OAuth URL`);
             }
 
             const data = await response.json();
             
             if (!data.success) {
-                throw new Error(data.message || 'Failed to get OAuth URL');
+                throw new Error(data.message || data.error || 'Failed to get OAuth URL');
             }
 
             return data.data;
 
         } catch (error) {
             if (this.shouldRetry(error)) {
-                return await this.retryWithBackoff(() => this.getOAuthUrl(provider, redirectUri, isLinking));
+                return await this.retryWithBackoff(() => this.getOAuthUrl(provider, redirectUri));
             }
             throw error;
         }
     }
 
     // Open popup and handle authentication flow
-    async openPopupAndAuthenticate(authUrl, state) {
+    async openPopupAndAuthenticate(authUrl) {
         return new Promise((resolve, reject) => {
             try {
                 // Calculate popup position (center of screen)
-                const left = (screen.width - this.config.popupWidth) / 2;
-                const top = (screen.height - this.config.popupHeight) / 2;
+                const left = Math.max(0, (screen.width - this.config.popupWidth) / 2);
+                const top = Math.max(0, (screen.height - this.config.popupHeight) / 2);
 
                 const popupFeatures = [
                     `width=${this.config.popupWidth}`,
@@ -297,7 +243,7 @@ class SocialAuthManager {
                 this.popupWindow = window.open(authUrl, 'oauth_popup', popupFeatures);
 
                 if (!this.popupWindow) {
-                    throw new Error('Popup blocked. Please allow popups for this site.');
+                    throw new Error('Popup blocked. Please allow popups for this site and try again.');
                 }
 
                 // Focus the popup
@@ -336,7 +282,7 @@ class SocialAuthManager {
         }, this.config.pollInterval);
     }
 
-    // Handle popup window closure
+    // Handle popup window closure (user cancelled)
     handlePopupClosure() {
         this.cleanup();
         
@@ -345,16 +291,15 @@ class SocialAuthManager {
             this.authPromise = null;
         }
 
-        this.uiManager.showToast('Authentication cancelled', 'warning');
+        this.uiManager?.showToast('Authentication cancelled', 'warning');
     }
 
-    // Handle messages from popup window
+    // Handle messages from popup window (postMessage API)
     handlePopupMessage(event) {
         // Verify origin for security
         const allowedOrigins = [
             'https://api-auth.transitflow.qzz.io',
-            'https://account.transitflow.qzz.io',
-            window.location.origin
+            'https://account.transitflow.qzz.io'
         ];
 
         if (!allowedOrigins.includes(event.origin)) {
@@ -368,61 +313,41 @@ class SocialAuthManager {
 
         const data = event.data;
 
-        if (data.type === 'OAUTH_SUCCESS') {
-            this.handleOAuthSuccess(data);
-        } else if (data.type === 'OAUTH_ERROR') {
-            this.handleOAuthError(data.error, data.provider, data.isLinking);
-        } else if (data.type === 'OAUTH_CANCELLED') {
-            this.handlePopupClosure();
+        // Handle different message types from the unified OAuth flow
+        if (data.type === 'social-auth-success' && data.action === 'login') {
+            this.handleLoginSuccess(data);
+        } else if (data.type === 'social-auth-error') {
+            this.handleOAuthError(data.error, data.provider, data.errorCode);
         }
     }
 
-    // Handle successful OAuth authentication
-    async handleOAuthSuccess(data) {
+    // Handle successful OAuth login
+    async handleLoginSuccess(data) {
         try {
             this.cleanup();
 
-            if (this.linkingMode) {
-                // Handle account linking success
-                this.uiManager.showToast(
-                    `${this.getProviderName(data.provider)} account linked successfully!`,
-                    'success'
-                );
-                
-                // Emit event for account linking
-                this.emitEvent('accountLinked', {
-                    provider: data.provider,
-                    email: data.email,
-                    displayName: data.displayName
-                });
+            // The actual redirect happens in the popup, but we can show success message
+            this.uiManager?.showToast(
+                `Successfully logged in with ${this.getProviderName(data.provider)}!`,
+                'success'
+            );
 
-            } else {
-                // Handle login success
-                this.authManager.currentUser = data.user;
-                this.authManager.authToken = data.token;
-
-                this.uiManager.showToast(
-                    `Welcome ${data.user.firstName || data.user.username}!`,
-                    'success'
-                );
-
-                // Emit event for successful login
-                this.emitEvent('loginSuccess', {
-                    provider: data.provider,
-                    user: data.user,
-                    loginMethod: 'social'
-                });
-
-                // Redirect to dashboard
-                setTimeout(() => {
-                    this.authManager.redirectToDashboard();
-                }, 1500);
-            }
+            // Emit event for successful login
+            this.emitEvent('loginSuccess', {
+                provider: data.provider,
+                message: data.message,
+                loginMethod: 'social'
+            });
 
             if (this.authPromise) {
                 this.authPromise.resolve(data);
                 this.authPromise = null;
             }
+
+            // Close popup and redirect parent window
+            setTimeout(() => {
+                window.location.href = `${this.config.frontendBaseUrl}/dashboard`;
+            }, 1500);
 
         } catch (error) {
             console.error('Error handling OAuth success:', error);
@@ -431,30 +356,49 @@ class SocialAuthManager {
     }
 
     // Handle OAuth errors with detailed error mapping
-    handleOAuthError(error, provider, isLinking = false) {
+    handleOAuthError(error, provider, errorCode = null) {
         const errorMessages = {
-            'oauth_denied': `${this.getProviderName(provider)} access was denied. Please try again and allow access to continue.`,
-            'oauth_failed': `Authentication with ${this.getProviderName(provider)} failed. Please try again.`,
-            'account_not_linked': `This ${this.getProviderName(provider)} account is not linked to any TransitFLOW account. Please link it first or create a new account.`,
-            'account_disabled': 'Your account has been disabled. Please contact support.',
-            'account_exists': `An account with this ${this.getProviderName(provider)} email already exists. Please sign in with your existing account.`,
-            'linking_failed': `Failed to link ${this.getProviderName(provider)} account. Please try again.`,
-            'provider_error': `${this.getProviderName(provider)} is experiencing issues. Please try again later.`,
-            'rate_limited': 'Too many authentication attempts. Please wait a few minutes before trying again.',
-            'server_error': 'Server error occurred. Please try again later.',
-            'network_error': 'Network connection failed. Please check your internet and try again.',
-            'popup_blocked': 'Popup was blocked. Please allow popups for this site and try again.',
-            'timeout': 'Authentication timed out. Please try again.',
-            'cancelled': 'Authentication was cancelled.',
-            'invalid_state': 'Security validation failed. Please try again.',
-            'invalid_provider': `${this.getProviderName(provider)} is not supported or configured.`
+            'OAUTH_PROVIDER_ERROR': `${this.getProviderName(provider)} access was denied or failed. Please try again.`,
+            'MISSING_AUTH_CODE': `Authentication with ${this.getProviderName(provider)} failed. Please try again.`,
+            'EMAIL_REQUIRED': `${this.getProviderName(provider)} must provide an email address to continue.`,
+            'STATE_EXPIRED': 'Authentication session expired. Please try again.',
+            'INVALID_STATE_ACTION': 'Security validation failed. Please try again.',
+            'TOKEN_EXCHANGE_FAILED': `Failed to authenticate with ${this.getProviderName(provider)}. Please try again.`,
+            'USER_INFO_FETCH_FAILED': `Failed to get your information from ${this.getProviderName(provider)}. Please try again.`,
+            'PROVIDER_NOT_CONFIGURED': `${this.getProviderName(provider)} login is not available right now. Please try another method.`,
+            'INVALID_REDIRECT_DOMAIN': 'Security error occurred. Please contact support.',
+            'AUTHENTICATION_REQUIRED': 'You must be logged in to perform this action.',
+            'INVALID_TOKEN': 'Your session has expired. Please login again.',
+            'ACCOUNT_ALREADY_LINKED': 'This social account is already linked to another user.',
+            'PROVIDER_ALREADY_LINKED': 'You already have this provider linked to your account.',
+            'USER_NOT_FOUND': 'User account not found. Please contact support.',
+            'INTERNAL_SERVER_ERROR': 'Server error occurred. Please try again later.',
+            'NETWORK_ERROR': 'Network connection failed. Please check your internet and try again.',
+            'TIMEOUT': 'Authentication timed out. Please try again.',
+            'POPUP_BLOCKED': 'Popup was blocked. Please allow popups for this site and try again.',
+            'CANCELLED': 'Authentication was cancelled.'
         };
 
-        const message = errorMessages[error] || errorMessages['oauth_failed'];
-        const type = ['account_disabled', 'server_error', 'provider_error'].includes(error) ? 'error' : 'warning';
+        // Map generic errors
+        const genericErrors = {
+            'oauth_denied': 'OAUTH_PROVIDER_ERROR',
+            'oauth_failed': 'TOKEN_EXCHANGE_FAILED',
+            'account_disabled': 'INTERNAL_SERVER_ERROR',
+            'rate_limited': 'INTERNAL_SERVER_ERROR',
+            'server_error': 'INTERNAL_SERVER_ERROR',
+            'network_error': 'NETWORK_ERROR',
+            'popup_blocked': 'POPUP_BLOCKED',
+            'timeout': 'TIMEOUT',
+            'cancelled': 'CANCELLED',
+            'invalid_provider': 'PROVIDER_NOT_CONFIGURED'
+        };
+
+        const mappedErrorCode = genericErrors[error] || errorCode || error;
+        const message = errorMessages[mappedErrorCode] || errorMessages['TOKEN_EXCHANGE_FAILED'];
+        const type = ['INTERNAL_SERVER_ERROR', 'PROVIDER_NOT_CONFIGURED'].includes(mappedErrorCode) ? 'error' : 'warning';
 
         this.cleanup();
-        this.uiManager.showToast(message, type);
+        this.uiManager?.showToast(message, type);
 
         if (this.authPromise) {
             this.authPromise.reject(new Error(message));
@@ -463,49 +407,54 @@ class SocialAuthManager {
 
         // Emit error event
         this.emitEvent('authError', {
-            error,
+            error: mappedErrorCode,
             provider,
-            isLinking,
             message
         });
 
-        // For specific errors, provide additional guidance
-        if (error === 'account_not_linked') {
-            setTimeout(() => {
-                this.uiManager.showToast(
-                    'Would you like to create a new account or link to an existing one?',
-                    'info',
-                    8000
-                );
-            }, 2000);
-        }
+        // Log error for debugging
+        console.error('OAuth Error:', {
+            originalError: error,
+            errorCode,
+            mappedErrorCode,
+            provider,
+            message
+        });
+    }
+
+    // Handle URL-based errors (fallback)
+    handleUrlError(error) {
+        const errorMessages = {
+            'access_denied': 'Access was denied. Please try again and allow access to continue.',
+            'invalid_request': 'Invalid authentication request. Please try again.',
+            'unauthorized': 'Authentication failed. Please try again.',
+            'server_error': 'Server error occurred. Please try again later.'
+        };
+
+        const message = errorMessages[error] || 'Authentication failed. Please try again.';
+        this.uiManager?.showToast(message, 'error');
     }
 
     // Handle general social authentication errors
-    handleSocialError(error, provider, isLinking = false) {
+    handleSocialError(error, provider) {
         console.error(`Social auth error (${provider}):`, error);
 
-        let errorType = 'oauth_failed';
-        let message = error.message || `Authentication with ${this.getProviderName(provider)} failed`;
-
+        let errorType = 'TOKEN_EXCHANGE_FAILED';
+        
         // Map specific errors
         if (error.message.includes('popup') || error.message.includes('blocked')) {
-            errorType = 'popup_blocked';
+            errorType = 'POPUP_BLOCKED';
         } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
-            errorType = 'timeout';
+            errorType = 'TIMEOUT';
         } else if (error.message.includes('cancelled')) {
-            errorType = 'cancelled';
+            errorType = 'CANCELLED';
         } else if (error.message.includes('network') || error.name === 'NetworkError') {
-            errorType = 'network_error';
-        } else if (error.status === 429) {
-            errorType = 'rate_limited';
-        } else if (error.status >= 500) {
-            errorType = 'server_error';
-        } else if (error.status === 400 && error.message.includes('provider')) {
-            errorType = 'invalid_provider';
+            errorType = 'NETWORK_ERROR';
+        } else if (error.message.includes('not configured') || error.message.includes('not available')) {
+            errorType = 'PROVIDER_NOT_CONFIGURED';
         }
 
-        this.handleOAuthError(errorType, provider, isLinking);
+        this.handleOAuthError(errorType, provider);
     }
 
     // Parse error response from fetch
@@ -529,7 +478,7 @@ class SocialAuthManager {
     // Utility methods
     validateProvider(provider) {
         if (!this.supportedProviders.includes(provider)) {
-            this.uiManager.showToast(`${provider} is not a supported provider`, 'error');
+            this.uiManager?.showToast(`${provider} is not a supported login provider`, 'error');
             return false;
         }
         return true;
@@ -539,25 +488,27 @@ class SocialAuthManager {
         return this.providerConfig[provider]?.name || provider.charAt(0).toUpperCase() + provider.slice(1);
     }
 
-    setButtonLoading(provider, isLoading, mode = 'login') {
-        const buttonId = mode === 'link' ? `link-${provider}` : `${provider}-login`;
-        const button = document.getElementById(buttonId);
+    setButtonLoading(provider, isLoading) {
+        const button = document.getElementById(`${provider}-login`);
         
         if (!button) return;
 
         if (isLoading) {
             button.disabled = true;
             button.setAttribute('data-original-text', button.textContent);
+            button.setAttribute('data-original-html', button.innerHTML);
             const providerName = this.getProviderName(provider);
-            const actionText = mode === 'link' ? 'Linking' : 'Connecting';
-            button.innerHTML = `<i class="bx bx-loader-alt rotating"></i> ${actionText} to ${providerName}...`;
+            button.innerHTML = `<i class="bx bx-loader-alt bx-spin"></i> Connecting to ${providerName}...`;
+            button.classList.add('loading');
         } else {
             button.disabled = false;
-            const originalText = button.getAttribute('data-original-text');
-            if (originalText) {
-                button.textContent = originalText;
+            const originalHtml = button.getAttribute('data-original-html');
+            if (originalHtml) {
+                button.innerHTML = originalHtml;
                 button.removeAttribute('data-original-text');
+                button.removeAttribute('data-original-html');
             }
+            button.classList.remove('loading');
         }
     }
 
@@ -570,14 +521,15 @@ class SocialAuthManager {
         const retryableErrors = [
             'NetworkError',
             'TypeError',
-            'network_error',
-            'timeout'
+            'NETWORK_ERROR',
+            'TIMEOUT'
         ];
 
         return retryableErrors.some(retryError => 
             error.name === retryError || 
             error.type === retryError || 
-            error.message.toLowerCase().includes(retryError.toLowerCase())
+            error.message.toLowerCase().includes(retryError.toLowerCase()) ||
+            error.message.includes('fetch')
         );
     }
 
@@ -586,7 +538,7 @@ class SocialAuthManager {
         this.retryCount++;
         const delay = this.config.retryDelay * Math.pow(2, this.retryCount - 1);
         
-        this.uiManager.showToast(
+        this.uiManager?.showToast(
             `Connection failed. Retrying in ${Math.round(delay / 1000)} seconds... (${this.retryCount}/${this.config.maxRetries})`,
             'warning'
         );
@@ -606,7 +558,11 @@ class SocialAuthManager {
     // Cleanup resources
     cleanup() {
         if (this.popupWindow && !this.popupWindow.closed) {
-            this.popupWindow.close();
+            try {
+                this.popupWindow.close();
+            } catch (e) {
+                // Popup might already be closed or inaccessible
+            }
         }
         
         if (this.pollTimer) {
@@ -620,14 +576,15 @@ class SocialAuthManager {
 
         this.popupWindow = null;
         this.currentProvider = null;
-        this.linkingMode = false;
         this.retryCount = 0;
     }
 
     // Clean up URL parameters
     cleanupUrl() {
-        const currentPath = window.location.pathname;
-        window.history.replaceState({}, document.title, currentPath);
+        if (window.history && window.history.replaceState) {
+            const currentPath = window.location.pathname;
+            window.history.replaceState({}, document.title, currentPath);
+        }
     }
 
     // Destroy method for complete cleanup
@@ -635,52 +592,10 @@ class SocialAuthManager {
         this.cleanup();
         window.removeEventListener('message', this.handlePopupMessage);
         window.removeEventListener('beforeunload', this.cleanup);
+        document.removeEventListener('visibilitychange', () => {});
     }
 
     // Public API methods for external integration
-    getLinkedAccounts(userId) {
-        // This would typically fetch from your API
-        return fetch(`${this.config.apiBaseurl_social}/social/linked-accounts/${userId}`, {
-            credentials: 'include'
-        }).then(response => response.json());
-    }
-
-    async unlinkAccount(provider) {
-        try {
-            const response = await fetch(`${this.config.apiBaseurl_social}/social/unlink`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({ provider })
-            });
-
-            if (!response.ok) {
-                const errorData = await this.parseErrorResponse(response);
-                throw new Error(errorData.message || 'Failed to unlink account');
-            }
-
-            const data = await response.json();
-            
-            this.uiManager.showToast(
-                `${this.getProviderName(provider)} account unlinked successfully`,
-                'success'
-            );
-
-            this.emitEvent('accountUnlinked', { provider });
-            
-            return data;
-
-        } catch (error) {
-            console.error('Unlink error:', error);
-            this.uiManager.showToast(
-                `Failed to unlink ${this.getProviderName(provider)} account: ${error.message}`,
-                'error'
-            );
-            throw error;
-        }
-    }
 
     // Get current configuration
     getConfig() {
@@ -705,5 +620,20 @@ class SocialAuthManager {
             name: this.getProviderName(provider),
             ...this.providerConfig[provider]
         }));
+    }
+
+    // Get provider configuration
+    getProviderConfig(provider) {
+        return this.providerConfig[provider] || null;
+    }
+
+    // Check if currently processing authentication
+    isAuthenticating() {
+        return !!(this.popupWindow && !this.popupWindow.closed);
+    }
+
+    // Manual trigger for specific provider (programmatic usage)
+    triggerLogin(provider, options = {}) {
+        return this.handleLogin(provider, options);
     }
 }
