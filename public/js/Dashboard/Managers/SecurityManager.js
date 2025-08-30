@@ -282,8 +282,8 @@ class SecurityManager {
         try {
             // Load linked accounts and stats from the new backend endpoints
             const [accountsResponse, statsResponse] = await Promise.all([
-                this.dashboard.apiManager.makeRequest('/api/users/social-accounts'),
-                this.dashboard.apiManager.makeRequest('/api/users/social-accounts/stats')
+                this.dashboard.apiManager.makeRequest('/social/social-accounts'),
+                this.dashboard.apiManager.makeRequest('/social/social-accounts/stats')
             ]);
 
             const linkedAccounts = accountsResponse.data?.linkedAccounts || [];
@@ -738,7 +738,7 @@ class SecurityManager {
         try {
             this.dashboard.loadingManager.showLoading(true);
             // Use the new backend endpoint for linking
-            const response = await this.dashboard.apiManager.makeRequest(`/api/users/social/${provider}?action=link`);
+            const response = await this.dashboard.apiManager.makeRequest(`/social/${provider}?action=link`);
 
             if (response.data && response.data.authUrl) {
                 const width = 600, height = 700;
@@ -774,7 +774,7 @@ class SecurityManager {
         try {
             this.dashboard.loadingManager.showLoading(true);
             // Use the new DELETE endpoint for unlinking
-            await this.dashboard.apiManager.makeRequest(`/api/users/social-accounts/${provider}`, {
+            await this.dashboard.apiManager.makeRequest(`/social/social-accounts/${provider}`, {
                 method: 'DELETE'
             });
 
@@ -809,7 +809,7 @@ class SecurityManager {
             }
 
             // Use the new sync endpoint
-            await this.dashboard.apiManager.makeRequest(`/api/users/social-accounts/sync/${provider}`, {
+            await this.dashboard.apiManager.makeRequest(`/social-accounts/sync/${provider}`, {
                 method: 'POST'
             });
 
