@@ -4,20 +4,15 @@ class SocialAuthManager {
         this.config = {
             apiBbaseUrl_social: 'https://api-auth.transitflow.qzz.io/api/users',
             frontendBaseUrl: 'https://account.transitflow.qzz.io',
-            popupWidth: 500,
-            popupHeight: 600,
-            popupTimeout: 300000, // 5 minutes
-            pollInterval: 1000,
             maxRetries: 3,
             retryDelay: 1500,
+            useDirectRedirect: true, // New option to control redirect behavior
             ...config
         };
 
         this.authManager = null;
         this.uiManager = null;
         this.networkManager = null;
-        this.popupWindow = null;
-        this.pollTimer = null;
         this.currentProvider = null;
         this.retryCount = 0;
         
@@ -64,19 +59,15 @@ class SocialAuthManager {
         
         // Bind methods to preserve context
         this.handleLogin = this.handleLogin.bind(this);
-        this.handlePopupMessage = this.handlePopupMessage.bind(this);
         
         this.setupEventListeners();
         this.handleUrlParameters();
         
-        console.log('SocialAuthManager initialized successfully');
+        console.log('SocialAuthManager initialized successfully (same-tab mode)');
     }
 
     // Setup event listeners for social login buttons
     setupEventListeners() {
-        // Listen for postMessage from OAuth popup
-        window.addEventListener('message', this.handlePopupMessage);
-
         // Setup social login buttons
         this.supportedProviders.forEach(provider => {
             const button = document.getElementById(`${provider}-login`);
@@ -87,41 +78,34 @@ class SocialAuthManager {
                 });
             }
         });
-
-        // Handle page unload to cleanup popup
-        window.addEventListener('beforeunload', () => {
-            this.cleanup();
-        });
-
-        // Handle visibility change (tab switching)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && this.popupWindow) {
-                // User switched tabs, show a toast reminder
-                setTimeout(() => {
-                    if (this.popupWindow && !this.popupWindow.closed) {
-                        this.uiManager?.showToast(
-                            'Please complete the authentication in the popup window',
-                            'info'
-                        );
-                    }
-                }, 2000);
-            }
-        });
     }
 
-    // Handle URL parameters for OAuth error redirects
+    // Handle URL parameters for OAuth success/error redirects
     handleUrlParameters() {
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
         const code = urlParams.get('code');
+        const linked = urlParams.get('linked');
+        const success = urlParams.get('success');
 
         if (error) {
             setTimeout(() => {
-                this.handleUrlError(error);
+                this.handleUrlError(error, urlParams.get('provider'));
                 this.cleanupUrl();
             }, 500);
+        } else if (linked && success) {
+            // Handle successful account linking
+            setTimeout(() => {
+                this.uiManager?.showToast(
+                    `Successfully linked your ${this.getProviderName(linked)} account!`,
+                    'success'
+                );
+                this.cleanupUrl();
+                this.emitEvent('accountLinked', { provider: linked });
+            }, 500);
         } else if (code) {
-            // URL callback should not happen with popup flow, but handle gracefully
+            // OAuth callback completed - this shouldn't happen in same-tab flow
+            // but we handle it gracefully
             setTimeout(() => {
                 this.uiManager?.showToast('Login completed successfully!', 'success');
                 this.cleanupUrl();
@@ -129,7 +113,7 @@ class SocialAuthManager {
         }
     }
 
-    // Main social login handler
+    // Main social login handler - modified for same-tab navigation
     async handleLogin(provider, options = {}) {
         if (!this.validateProvider(provider)) {
             return;
@@ -150,34 +134,63 @@ class SocialAuthManager {
             // Show loading state
             this.setButtonLoading(provider, true);
             this.uiManager?.showToast(
-                `Connecting to ${this.getProviderName(provider)}...`,
+                `Redirecting to ${this.getProviderName(provider)}...`,
                 'info'
             );
 
-            // Get OAuth URL from backend
-            const authData = await this.getOAuthUrl(provider, options.redirectUri);
-
-            if (!authData.authUrl) {
-                throw new Error('Failed to get OAuth URL from server');
+            // Use direct redirect approach
+            if (this.config.useDirectRedirect) {
+                // Direct redirect to OAuth endpoint
+                await this.redirectToOAuth(provider, options.redirectUri);
+            } else {
+                // Fetch URL then redirect (fallback)
+                const authData = await this.getOAuthUrl(provider, options.redirectUri);
+                if (authData.authUrl) {
+                    window.location.href = authData.authUrl;
+                } else {
+                    throw new Error('Failed to get OAuth URL from server');
+                }
             }
-
-            // Open popup and start authentication flow
-            await this.openPopupAndAuthenticate(authData.authUrl);
 
         } catch (error) {
             console.error(`${provider} login error:`, error);
             this.handleSocialError(error, provider);
-        } finally {
             this.setButtonLoading(provider, false);
         }
     }
 
-    // Get OAuth URL from backend (login only)
+    // Direct redirect to OAuth endpoint (recommended approach)
+    async redirectToOAuth(provider, redirectUri = null) {
+        const params = new URLSearchParams();
+        
+        // Set action to login
+        params.append('action', 'login');
+        
+        if (redirectUri) {
+            params.append('redirect_uri', redirectUri);
+        }
+
+        const queryString = params.toString() ? '?' + params.toString() : '';
+        const oauthUrl = `${this.config.apiBbaseUrl_social}/social/${provider}${queryString}`;
+        
+        // Emit event before redirect
+        this.emitEvent('loginStarted', {
+            provider,
+            method: 'same-tab',
+            url: oauthUrl
+        });
+
+        // Redirect to OAuth endpoint
+        window.location.href = oauthUrl;
+    }
+
+    // Get OAuth URL from backend (fallback method)
     async getOAuthUrl(provider, redirectUri = null) {
         const params = new URLSearchParams();
         
-        // Always set action to login (default behavior)
+        // Always set action to login and format to json
         params.append('action', 'login');
+        params.append('format', 'json'); // Request JSON response
         
         if (redirectUri) {
             params.append('redirect_uri', redirectUri);
@@ -217,244 +230,62 @@ class SocialAuthManager {
         }
     }
 
-    // Open popup and handle authentication flow
-    async openPopupAndAuthenticate(authUrl) {
-        return new Promise((resolve, reject) => {
-            try {
-                // Calculate popup position (center of screen)
-                const left = Math.max(0, (screen.width - this.config.popupWidth) / 2);
-                const top = Math.max(0, (screen.height - this.config.popupHeight) / 2);
-
-                const popupFeatures = [
-                    `width=${this.config.popupWidth}`,
-                    `height=${this.config.popupHeight}`,
-                    `left=${left}`,
-                    `top=${top}`,
-                    'scrollbars=yes',
-                    'resizable=yes',
-                    'toolbar=no',
-                    'location=no',
-                    'directories=no',
-                    'status=no',
-                    'menubar=no'
-                ].join(',');
-
-                // Open popup
-                this.popupWindow = window.open(authUrl, 'oauth_popup', popupFeatures);
-
-                if (!this.popupWindow) {
-                    throw new Error('Popup blocked. Please allow popups for this site and try again.');
-                }
-
-                // Focus the popup
-                if (this.popupWindow.focus) {
-                    this.popupWindow.focus();
-                }
-
-                // Set timeout for authentication
-                const timeout = setTimeout(() => {
-                    this.cleanup();
-                    reject(new Error('Authentication timed out. Please try again.'));
-                }, this.config.popupTimeout);
-
-                // Store resolve/reject for message handler
-                this.authPromise = { resolve, reject, timeout };
-
-                // Start polling for popup closure
-                this.startPopupPolling();
-
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    // Start polling for popup window closure
-    startPopupPolling() {
-        if (this.pollTimer) {
-            clearInterval(this.pollTimer);
-        }
-
-        this.pollTimer = setInterval(() => {
-            if (!this.popupWindow || this.popupWindow.closed) {
-                this.handlePopupClosure();
-            }
-        }, this.config.pollInterval);
-    }
-
-    // Handle popup window closure (user cancelled)
-    handlePopupClosure() {
-        this.cleanup();
-        
-        if (this.authPromise) {
-            this.authPromise.reject(new Error('Authentication cancelled by user'));
-            this.authPromise = null;
-        }
-
-        this.uiManager?.showToast('Authentication cancelled', 'warning');
-    }
-
-    // Handle messages from popup window (postMessage API)
-    handlePopupMessage(event) {
-        // Verify origin for security
-        const allowedOrigins = [
-            'https://api-auth.transitflow.qzz.io',
-            'https://account.transitflow.qzz.io'
-        ];
-
-        if (!allowedOrigins.includes(event.origin)) {
-            console.warn('Received message from unauthorized origin:', event.origin);
-            return;
-        }
-
-        if (!this.authPromise) {
-            return;
-        }
-
-        const data = event.data;
-
-        // Handle different message types from the unified OAuth flow
-        if (data.type === 'social-auth-success' && data.action === 'login') {
-            this.handleLoginSuccess(data);
-        } else if (data.type === 'social-auth-error') {
-            this.handleOAuthError(data.error, data.provider, data.errorCode);
-        }
-    }
-
-    // Handle successful OAuth login
-    async handleLoginSuccess(data) {
-        try {
-            this.cleanup();
-
-            // The actual redirect happens in the popup, but we can show success message
-            this.uiManager?.showToast(
-                `Successfully logged in with ${this.getProviderName(data.provider)}!`,
-                'success'
-            );
-
-            // Emit event for successful login
-            this.emitEvent('loginSuccess', {
-                provider: data.provider,
-                message: data.message,
-                loginMethod: 'social'
-            });
-
-            if (this.authPromise) {
-                this.authPromise.resolve(data);
-                this.authPromise = null;
-            }
-
-            // Close popup and redirect parent window
-            setTimeout(() => {
-                window.location.href = `${this.config.frontendBaseUrl}/dashboard`;
-            }, 1500);
-
-        } catch (error) {
-            console.error('Error handling OAuth success:', error);
-            this.handleSocialError(error, data.provider);
-        }
-    }
-
-    // Handle OAuth errors with detailed error mapping
-    handleOAuthError(error, provider, errorCode = null) {
-        const errorMessages = {
-            'OAUTH_PROVIDER_ERROR': `${this.getProviderName(provider)} access was denied or failed. Please try again.`,
-            'MISSING_AUTH_CODE': `Authentication with ${this.getProviderName(provider)} failed. Please try again.`,
-            'EMAIL_REQUIRED': `${this.getProviderName(provider)} must provide an email address to continue.`,
-            'STATE_EXPIRED': 'Authentication session expired. Please try again.',
-            'INVALID_STATE_ACTION': 'Security validation failed. Please try again.',
-            'TOKEN_EXCHANGE_FAILED': `Failed to authenticate with ${this.getProviderName(provider)}. Please try again.`,
-            'USER_INFO_FETCH_FAILED': `Failed to get your information from ${this.getProviderName(provider)}. Please try again.`,
-            'PROVIDER_NOT_CONFIGURED': `${this.getProviderName(provider)} login is not available right now. Please try another method.`,
-            'INVALID_REDIRECT_DOMAIN': 'Security error occurred. Please contact support.',
-            'AUTHENTICATION_REQUIRED': 'You must be logged in to perform this action.',
-            'INVALID_TOKEN': 'Your session has expired. Please login again.',
-            'ACCOUNT_ALREADY_LINKED': 'This social account is already linked to another user.',
-            'PROVIDER_ALREADY_LINKED': 'You already have this provider linked to your account.',
-            'USER_NOT_FOUND': 'User account not found. Please contact support.',
-            'INTERNAL_SERVER_ERROR': 'Server error occurred. Please try again later.',
-            'NETWORK_ERROR': 'Network connection failed. Please check your internet and try again.',
-            'TIMEOUT': 'Authentication timed out. Please try again.',
-            'POPUP_BLOCKED': 'Popup was blocked. Please allow popups for this site and try again.',
-            'CANCELLED': 'Authentication was cancelled.'
-        };
-
-        // Map generic errors
-        const genericErrors = {
-            'oauth_denied': 'OAUTH_PROVIDER_ERROR',
-            'oauth_failed': 'TOKEN_EXCHANGE_FAILED',
-            'account_disabled': 'INTERNAL_SERVER_ERROR',
-            'rate_limited': 'INTERNAL_SERVER_ERROR',
-            'server_error': 'INTERNAL_SERVER_ERROR',
-            'network_error': 'NETWORK_ERROR',
-            'popup_blocked': 'POPUP_BLOCKED',
-            'timeout': 'TIMEOUT',
-            'cancelled': 'CANCELLED',
-            'invalid_provider': 'PROVIDER_NOT_CONFIGURED'
-        };
-
-        const mappedErrorCode = genericErrors[error] || errorCode || error;
-        const message = errorMessages[mappedErrorCode] || errorMessages['TOKEN_EXCHANGE_FAILED'];
-        const type = ['INTERNAL_SERVER_ERROR', 'PROVIDER_NOT_CONFIGURED'].includes(mappedErrorCode) ? 'error' : 'warning';
-
-        this.cleanup();
-        this.uiManager?.showToast(message, type);
-
-        if (this.authPromise) {
-            this.authPromise.reject(new Error(message));
-            this.authPromise = null;
-        }
-
-        // Emit error event
-        this.emitEvent('authError', {
-            error: mappedErrorCode,
-            provider,
-            message
-        });
-
-        // Log error for debugging
-        console.error('OAuth Error:', {
-            originalError: error,
-            errorCode,
-            mappedErrorCode,
-            provider,
-            message
-        });
-    }
-
-    // Handle URL-based errors (fallback)
-    handleUrlError(error) {
+    // Handle URL-based errors (from OAuth redirect)
+    handleUrlError(error, provider = null) {
         const errorMessages = {
             'access_denied': 'Access was denied. Please try again and allow access to continue.',
             'invalid_request': 'Invalid authentication request. Please try again.',
             'unauthorized': 'Authentication failed. Please try again.',
-            'server_error': 'Server error occurred. Please try again later.'
+            'server_error': 'Server error occurred. Please try again later.',
+            'oauth_error': 'OAuth provider error occurred. Please try again.',
+            'email_required': 'Email address is required from your social account to continue.',
+            'account_already_linked': 'This social account is already linked to another user.',
+            'provider_already_linked': 'You already have this provider linked to your account.',
+            'provider_not_configured': 'This login method is not available right now. Please try another method.'
         };
 
         const message = errorMessages[error] || 'Authentication failed. Please try again.';
-        this.uiManager?.showToast(message, 'error');
+        const providerName = provider ? this.getProviderName(provider) : 'social provider';
+        const fullMessage = provider ? 
+            message.replace('social account', `${providerName} account`).replace('provider', providerName) : 
+            message;
+
+        this.uiManager?.showToast(fullMessage, 'error');
+
+        // Emit error event
+        this.emitEvent('authError', {
+            error,
+            provider,
+            message: fullMessage,
+            source: 'url_redirect'
+        });
     }
 
     // Handle general social authentication errors
     handleSocialError(error, provider) {
         console.error(`Social auth error (${provider}):`, error);
 
-        let errorType = 'TOKEN_EXCHANGE_FAILED';
+        let errorMessage = `Failed to authenticate with ${this.getProviderName(provider)}. Please try again.`;
+        let errorType = 'error';
         
         // Map specific errors
-        if (error.message.includes('popup') || error.message.includes('blocked')) {
-            errorType = 'POPUP_BLOCKED';
-        } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
-            errorType = 'TIMEOUT';
-        } else if (error.message.includes('cancelled')) {
-            errorType = 'CANCELLED';
-        } else if (error.message.includes('network') || error.name === 'NetworkError') {
-            errorType = 'NETWORK_ERROR';
+        if (error.message.includes('network') || error.name === 'NetworkError') {
+            errorMessage = 'Network connection failed. Please check your internet and try again.';
         } else if (error.message.includes('not configured') || error.message.includes('not available')) {
-            errorType = 'PROVIDER_NOT_CONFIGURED';
+            errorMessage = `${this.getProviderName(provider)} login is not available right now. Please try another method.`;
+        } else if (error.message.includes('blocked')) {
+            errorMessage = 'Authentication was blocked. Please try again.';
         }
 
-        this.handleOAuthError(errorType, provider);
+        this.uiManager?.showToast(errorMessage, errorType);
+
+        // Emit error event
+        this.emitEvent('authError', {
+            error: error.message,
+            provider,
+            message: errorMessage,
+            source: 'javascript'
+        });
     }
 
     // Parse error response from fetch
@@ -498,7 +329,7 @@ class SocialAuthManager {
             button.setAttribute('data-original-text', button.textContent);
             button.setAttribute('data-original-html', button.innerHTML);
             const providerName = this.getProviderName(provider);
-            button.innerHTML = `<i class="bx bx-loader-alt bx-spin"></i> Connecting to ${providerName}...`;
+            button.innerHTML = `<i class="bx bx-loader-alt bx-spin"></i> Redirecting to ${providerName}...`;
             button.classList.add('loading');
         } else {
             button.disabled = false;
@@ -555,44 +386,12 @@ class SocialAuthManager {
         document.dispatchEvent(event);
     }
 
-    // Cleanup resources
-    cleanup() {
-        if (this.popupWindow && !this.popupWindow.closed) {
-            try {
-                this.popupWindow.close();
-            } catch (e) {
-                // Popup might already be closed or inaccessible
-            }
-        }
-        
-        if (this.pollTimer) {
-            clearInterval(this.pollTimer);
-            this.pollTimer = null;
-        }
-
-        if (this.authPromise && this.authPromise.timeout) {
-            clearTimeout(this.authPromise.timeout);
-        }
-
-        this.popupWindow = null;
-        this.currentProvider = null;
-        this.retryCount = 0;
-    }
-
     // Clean up URL parameters
     cleanupUrl() {
         if (window.history && window.history.replaceState) {
             const currentPath = window.location.pathname;
             window.history.replaceState({}, document.title, currentPath);
         }
-    }
-
-    // Destroy method for complete cleanup
-    destroy() {
-        this.cleanup();
-        window.removeEventListener('message', this.handlePopupMessage);
-        window.removeEventListener('beforeunload', this.cleanup);
-        document.removeEventListener('visibilitychange', () => {});
     }
 
     // Public API methods for external integration
@@ -605,6 +404,11 @@ class SocialAuthManager {
     // Update configuration
     updateConfig(newConfig) {
         this.config = { ...this.config, ...newConfig };
+    }
+
+    // Switch between direct redirect and fetch-then-redirect
+    setRedirectMode(useDirectRedirect) {
+        this.config.useDirectRedirect = useDirectRedirect;
     }
 
     // Check if provider is available/configured
@@ -627,13 +431,52 @@ class SocialAuthManager {
         return this.providerConfig[provider] || null;
     }
 
-    // Check if currently processing authentication
-    isAuthenticating() {
-        return !!(this.popupWindow && !this.popupWindow.closed);
-    }
-
     // Manual trigger for specific provider (programmatic usage)
     triggerLogin(provider, options = {}) {
         return this.handleLogin(provider, options);
+    }
+
+    // Create direct login URL for use in HTML links
+    getLoginUrl(provider, redirectUri = null) {
+        const params = new URLSearchParams();
+        params.append('action', 'login');
+        
+        if (redirectUri) {
+            params.append('redirect_uri', redirectUri);
+        }
+
+        const queryString = params.toString() ? '?' + params.toString() : '';
+        return `${this.config.apiBbaseUrl_social}/social/${provider}${queryString}`;
+    }
+
+    // Method to generate HTML for social login buttons
+    generateLoginButtonsHTML(containerClass = 'social-login-buttons') {
+        const buttonsHTML = this.supportedProviders.map(provider => {
+            const config = this.providerConfig[provider];
+            const loginUrl = this.getLoginUrl(provider);
+            
+            return `
+                <a href="${loginUrl}" 
+                   class="social-login-btn ${provider}-btn" 
+                   style="background-color: ${config.color};"
+                   data-provider="${provider}">
+                    <i class="bx ${config.icon}"></i>
+                    Continue with ${config.name}
+                </a>
+            `;
+        }).join('');
+
+        return `<div class="${containerClass}">${buttonsHTML}</div>`;
+    }
+
+    // Destroy method for complete cleanup
+    destroy() {
+        // Remove any event listeners that were added
+        this.supportedProviders.forEach(provider => {
+            const button = document.getElementById(`${provider}-login`);
+            if (button) {
+                button.removeEventListener('click', this.handleLogin);
+            }
+        });
     }
 }
