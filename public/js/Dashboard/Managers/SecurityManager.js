@@ -543,7 +543,7 @@ class SecurityManager {
         // ... this function remains unchanged
         try {
             this.dashboard.loadingManager.showLoading(true);
-            const response = await this.dashboard.apiManager.makeRequest(`/oauth/${provider}`);
+            const response = await this.dashboard.apiManager.makeRequest(`/social/${provider}`);
             if (response.data && response.data.authUrl) {
                 const width = 600, height = 700;
                 const left = (window.screen.width / 2) - (width / 2);
