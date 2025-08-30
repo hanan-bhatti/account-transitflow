@@ -282,8 +282,8 @@ class SecurityManager {
         try {
             // Load linked accounts and stats from the new backend endpoints
             const [accountsResponse, statsResponse] = await Promise.all([
-                this.dashboard.apiManager.makeRequest('/social/social-accounts'),
-                this.dashboard.apiManager.makeRequest('/social/social-accounts/stats')
+                this.dashboard.apiManager.makeRequest('/social-accounts'),
+                this.dashboard.apiManager.makeRequest('/social-accounts/stats')
             ]);
 
             const linkedAccounts = accountsResponse.data?.linkedAccounts || [];
@@ -774,7 +774,7 @@ class SecurityManager {
         try {
             this.dashboard.loadingManager.showLoading(true);
             // Use the new DELETE endpoint for unlinking
-            await this.dashboard.apiManager.makeRequest(`/social/social-accounts/${provider}`, {
+            await this.dashboard.apiManager.makeRequest(`/social-accounts/${provider}`, {
                 method: 'DELETE'
             });
 
