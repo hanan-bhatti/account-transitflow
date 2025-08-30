@@ -280,17 +280,16 @@ class SecurityManager {
 
     async loadSocialAccounts() {
         try {
-            // Load available providers and stats based on your actual backend endpoints
-            const [availableResponse, statsResponse] = await Promise.all([
-                this.dashboard.apiManager.makeRequest('/social-accounts/available'),
-                this.dashboard.apiManager.makeRequest('/social-accounts/stats')
+            // Load linked accounts and stats from the new backend endpoints
+            const [accountsResponse, statsResponse] = await Promise.all([
+                this.dashboard.apiManager.makeRequest('/api/users/social-accounts'),
+                this.dashboard.apiManager.makeRequest('/api/users/social-accounts/stats')
             ]);
 
-            // Get user profile to check for linked accounts
-            const profileResponse = await this.dashboard.apiManager.makeRequest('/profile');
-            const linkedAccounts = profileResponse.data?.socialAccounts || [];
+            const linkedAccounts = accountsResponse.data?.linkedAccounts || [];
+            const statsData = statsResponse.data || {};
 
-            this.renderSocialAccountsInterface(linkedAccounts, statsResponse.data);
+            this.renderSocialAccountsInterface(linkedAccounts, statsData);
 
         } catch (error) {
             console.error('Failed to load social accounts:', error);
@@ -302,20 +301,21 @@ class SecurityManager {
         const container = document.getElementById('socialAccounts');
         if (!container) return;
 
-        // Filter for supported providers only
-        const supportedProviders = ['google', 'github', 'facebook'];
+        // Filter for supported providers only (matching your HTML)
+        const supportedProviders = ['google', 'facebook', 'github'];
         const filteredLinked = linkedAccounts.filter(account =>
-            supportedProviders.includes(account.provider) && account.isLinked
+            supportedProviders.includes(account.provider)
         );
 
-        // Render the parts that are still dynamic (linked accounts and stats)
+        // Render the dynamic content
         container.innerHTML = `
-            <div class="social-accounts-container">
-                ${this.renderLinkedAccounts(filteredLinked)}
-                ${this.renderSocialStats(statsData)}
-            </div>
-        `;
+        <div class="social-accounts-container">
+            ${this.renderLinkedAccounts(filteredLinked)}
+            ${this.renderSocialStats(statsData)}
+        </div>
+    `;
 
+        // Handle provider button visibility
         const linkedProviderNames = filteredLinked.map(acc => acc.provider);
         const providerButtons = document.querySelectorAll('#linkAccountSection .btn-social-provider');
         let availableCount = 0;
@@ -325,7 +325,7 @@ class SecurityManager {
             if (linkedProviderNames.includes(provider)) {
                 button.style.display = 'none'; // Hide if account is already linked
             } else {
-                button.style.display = 'inline-flex'; // Ensure it's visible if not linked
+                button.style.display = 'inline-flex'; // Show if not linked
                 availableCount++;
             }
         });
@@ -339,9 +339,24 @@ class SecurityManager {
             return `
             <div class="linked-accounts-section">
                 <h4 class="section-title">Linked Accounts</h4>
-                <div class="no-accounts">
-                    <i class="fas fa-link text-muted"></i>
-                    <p class="text-muted mb-0">No social accounts linked yet</p>
+                <div class="no-accounts" style="
+                    padding: 2rem;
+                    text-align: center;
+                    background: var(--bg-secondary);
+                    border-radius: 8px;
+                    border: 1px solid var(--border-color);
+                ">
+                    <i class="fas fa-link" style="
+                        font-size: 2rem;
+                        color: var(--text-muted);
+                        margin-bottom: 1rem;
+                        display: block;
+                    "></i>
+                    <p style="
+                        color: var(--text-muted);
+                        margin: 0;
+                        font-size: 0.9rem;
+                    ">No social accounts linked yet</p>
                 </div>
             </div>
         `;
@@ -349,8 +364,17 @@ class SecurityManager {
 
         return `
         <div class="linked-accounts-section">
-            <h4 class="section-title">Linked Accounts</h4>
-            <div class="social-accounts-grid">
+            <h4 class="section-title" style="
+                color: var(--text-primary);
+                margin-bottom: 1rem;
+                font-size: 1.1rem;
+                font-weight: 600;
+            ">Linked Accounts</h4>
+            <div class="social-accounts-grid" style="
+                display: grid;
+                gap: 1rem;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            ">
                 ${linkedAccounts.map(account => this.renderLinkedAccount(account)).join('')}
             </div>
         </div>
@@ -363,33 +387,107 @@ class SecurityManager {
         const isStale = account.lastSync && (Date.now() - new Date(account.lastSync).getTime()) > (30 * 24 * 60 * 60 * 1000);
 
         return `
-        <div class="social-account-card" data-provider="${account.provider}">
-            <div class="account-header">
-                <div class="provider-icon ${account.provider}">
-                    <i class="${providerConfig.icon}"></i>
+        <div class="social-account-card" data-provider="${account.provider}" style="
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 4px var(--shadow);
+            transition: box-shadow 0.2s ease;
+        ">
+            <div class="account-header" style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1rem;
+            ">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div class="provider-icon" style="
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background: ${providerConfig.color}15;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <i class="${providerConfig.icon}" style="
+                            color: ${providerConfig.color};
+                            font-size: 1.2rem;
+                        "></i>
+                    </div>
+                    <div class="account-info">
+                        <h5 class="provider-name" style="
+                            color: var(--text-primary);
+                            margin: 0 0 0.25rem 0;
+                            font-size: 1rem;
+                            font-weight: 600;
+                        ">${providerConfig.name}</h5>
+                        <p class="account-email" style="
+                            color: var(--text-secondary);
+                            margin: 0;
+                            font-size: 0.85rem;
+                        ">${account.email || account.displayName || 'Connected'}</p>
+                    </div>
                 </div>
-                <div class="account-info">
-                    <h5 class="provider-name">${providerConfig.name}</h5>
-                    <p class="account-email">${account.email || account.displayName || 'Connected'}</p>
-                </div>
-                <div class="account-actions">
+                <div class="account-actions" style="display: flex; gap: 0.5rem;">
                     <button class="btn-icon sync-account-btn" 
                             data-provider="${account.provider}" 
-                            title="Sync account data">
-                        <i class="fas fa-sync-alt ${isStale ? 'text-warning' : ''}"></i>
+                            title="Sync account data"
+                            style="
+                                background: var(--bg-secondary);
+                                border: 1px solid var(--border-color);
+                                width: 32px;
+                                height: 32px;
+                                border-radius: 6px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                            "
+                            onmouseover="this.style.background='var(--bg-tertiary)'"
+                            onmouseout="this.style.background='var(--bg-secondary)'">
+                        <i class="fas fa-sync-alt" style="
+                            color: ${isStale ? 'var(--warning)' : 'var(--text-secondary)'};
+                            font-size: 0.85rem;
+                        "></i>
                     </button>
                     <button class="btn-icon unlink-account-btn" 
                             data-provider="${account.provider}" 
-                            title="Unlink account">
-                        <i class="fas fa-unlink text-danger"></i>
+                            title="Unlink account"
+                            style="
+                                background: var(--bg-secondary);
+                                border: 1px solid var(--border-color);
+                                width: 32px;
+                                height: 32px;
+                                border-radius: 6px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                            "
+                            onmouseover="this.style.background='#fef2f2'"
+                            onmouseout="this.style.background='var(--bg-secondary)'">
+                        <i class="fas fa-unlink" style="
+                            color: var(--danger);
+                            font-size: 0.85rem;
+                        "></i>
                     </button>
                 </div>
             </div>
             <div class="account-meta">
-                <small class="text-muted">
+                <small style="
+                    color: var(--text-muted);
+                    font-size: 0.8rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                ">
                     <i class="fas fa-clock"></i>
                     Last synced: ${lastSync}
-                    ${isStale ? '<span class="text-warning"> (Outdated)</span>' : ''}
+                    ${isStale ? '<span style="color: var(--warning); font-weight: 500;"> (Outdated)</span>' : ''}
                 </small>
             </div>
         </div>
@@ -403,11 +501,28 @@ class SecurityManager {
         const hasRecommendations = recommendations && recommendations.length > 0;
 
         return `
-        <div class="social-stats-section ${hasRecommendations ? 'has-recommendations' : ''}">
-            <div class="stats-header">
-                <h4 class="section-title">Security Overview</h4>
+        <div class="social-stats-section" style="margin-top: 2rem;">
+            <div class="stats-header" style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1rem;
+            ">
+                <h4 class="section-title" style="
+                    color: var(--text-primary);
+                    margin: 0;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                ">Security Overview</h4>
                 <div class="auth-methods-count">
-                    <span class="badge ${security.totalAuthMethods >= 2 ? 'badge-success' : 'badge-warning'}">
+                    <span class="badge" style="
+                        background: ${security.totalAuthMethods >= 2 ? 'var(--success)' : 'var(--warning)'};
+                        color: white;
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 12px;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                    ">
                         ${security.totalAuthMethods} auth method${security.totalAuthMethods !== 1 ? 's' : ''}
                     </span>
                 </div>
@@ -419,14 +534,51 @@ class SecurityManager {
 
     renderRecommendations(recommendations) {
         return `
-        <div class="recommendations-list">
+        <div class="recommendations-list" style="
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        ">
+            <h5 style="
+                color: var(--text-primary);
+                margin: 0 0 0.75rem 0;
+                font-size: 0.9rem;
+                font-weight: 600;
+            ">Security Recommendations</h5>
             ${recommendations.map(rec => `
-                <div class="recommendation-item ${rec.priority}">
-                    <div class="rec-icon">
-                        <i class="fas ${this.getRecommendationIcon(rec.type)}"></i>
+                <div class="recommendation-item ${rec.priority}" style="
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 0.75rem;
+                    margin-bottom: 0.75rem;
+                    padding: 0.75rem;
+                    background: var(--bg-primary);
+                    border-radius: 6px;
+                    border-left: 3px solid ${this.getPriorityColor(rec.priority)};
+                ">
+                    <div class="rec-icon" style="
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50%;
+                        background: ${this.getPriorityColor(rec.priority)}15;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                    ">
+                        <i class="fas ${this.getRecommendationIcon(rec.type)}" style="
+                            color: ${this.getPriorityColor(rec.priority)};
+                            font-size: 0.85rem;
+                        "></i>
                     </div>
-                    <div class="rec-content">
-                        <p class="rec-message">${rec.message}</p>
+                    <div class="rec-content" style="flex: 1;">
+                        <p class="rec-message" style="
+                            color: var(--text-primary);
+                            margin: 0 0 0.5rem 0;
+                            font-size: 0.9rem;
+                            line-height: 1.4;
+                        ">${rec.message}</p>
                         ${rec.action ? this.renderRecommendationAction(rec) : ''}
                     </div>
                 </div>
@@ -436,20 +588,39 @@ class SecurityManager {
     }
 
     renderRecommendationAction(rec) {
+        const buttonStyle = `
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.375rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    `;
+
         switch (rec.action) {
             case 'set_password':
-                return '<button class="btn-sm btn-outline-primary rec-action-btn" data-action="set_password">Set Password</button>';
+                return `<button class="rec-action-btn" data-action="set_password" style="${buttonStyle}">Set Password</button>`;
             case 'link_more_accounts':
-                return '<button class="btn-sm btn-outline-info rec-action-btn" data-action="link_accounts">Link Accounts</button>';
+                return `<button class="rec-action-btn" data-action="link_accounts" style="${buttonStyle}">Link Accounts</button>`;
             case 'sync_accounts':
-                return `<button class="btn-sm btn-outline-warning rec-action-btn" data-action="sync_accounts" data-providers="${rec.providers?.join(',')}">Sync Accounts</button>`;
+                return `<button class="rec-action-btn" data-action="sync_accounts" data-providers="${rec.providers?.join(',')}" style="${buttonStyle}">Sync Accounts</button>`;
             default:
                 return '';
         }
     }
 
+    getPriorityColor(priority) {
+        switch (priority) {
+            case 'high': return 'var(--danger)';
+            case 'medium': return 'var(--warning)';
+            case 'low': return 'var(--info)';
+            default: return 'var(--text-muted)';
+        }
+    }
+
     getRecommendationIcon(type) {
-        // ... this function remains unchanged
         const icons = {
             'security': 'fa-shield-alt',
             'convenience': 'fa-link',
@@ -459,14 +630,40 @@ class SecurityManager {
     }
 
     renderSocialAccountsError() {
-        // ... this function remains unchanged
         const container = document.getElementById('socialAccounts');
         if (container) {
             container.innerHTML = `
-            <div class="error-state">
-                <i class="fas fa-exclamation-triangle text-warning"></i>
-                <p class="text-muted">Failed to load social accounts</p>
-                <button class="btn btn-sm btn-outline-primary retry-load-btn">
+            <div class="error-state" style="
+                text-align: center;
+                padding: 3rem 2rem;
+                background: var(--bg-secondary);
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+            ">
+                <i class="fas fa-exclamation-triangle" style="
+                    color: var(--warning);
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                    display: block;
+                "></i>
+                <p style="
+                    color: var(--text-muted);
+                    margin-bottom: 1.5rem;
+                    font-size: 1rem;
+                ">Failed to load social accounts</p>
+                <button class="retry-load-btn" style="
+                    background: var(--accent-primary);
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 6px;
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    transition: all 0.2s ease;
+                ">
                     <i class="fas fa-redo"></i> Retry
                 </button>
             </div>
@@ -478,14 +675,12 @@ class SecurityManager {
     }
 
     showLinkAccountSection(hasAvailableProviders) {
-        // ... this function remains unchanged
         const linkSection = document.getElementById('linkAccountSection');
         const linkNewBtn = document.getElementById('linkNewAccountBtn');
 
         if (linkSection && linkNewBtn) {
             if (hasAvailableProviders) {
                 linkNewBtn.style.display = 'block';
-                // Ensure listener is only added once or is idempotent
                 if (!linkNewBtn.dataset.listenerAttached) {
                     this.addTrackedEventListener(linkNewBtn, 'click', () => {
                         linkSection.style.display = linkSection.style.display === 'none' ? 'block' : 'none';
@@ -503,7 +698,7 @@ class SecurityManager {
         const container = document.getElementById('socialAccounts');
         if (!container) return;
 
-        // This now correctly targets the buttons in your static HTML
+        // Link account buttons in the static HTML section
         const linkSection = document.getElementById('linkAccountSection');
         if (linkSection) {
             linkSection.querySelectorAll('.btn-social-provider').forEach(btn => {
@@ -540,53 +735,99 @@ class SecurityManager {
     }
 
     async linkSocialProvider(provider) {
-        // ... this function remains unchanged
         try {
             this.dashboard.loadingManager.showLoading(true);
-            const response = await this.dashboard.apiManager.makeRequest(`/social/${provider}`);
+            // Use the new backend endpoint for linking
+            const response = await this.dashboard.apiManager.makeRequest(`/api/users/social/${provider}?action=link`);
+
             if (response.data && response.data.authUrl) {
                 const width = 600, height = 700;
                 const left = (window.screen.width / 2) - (width / 2);
                 const top = (window.screen.height / 2) - (height / 2);
-                const authWindow = window.open(response.data.authUrl, 'socialAuth', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+                const authWindow = window.open(
+                    response.data.authUrl,
+                    'socialAuth',
+                    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                );
                 this.monitorAuthWindow(authWindow, provider);
             }
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Link Failed', `Failed to initiate ${provider} linking: ${error.message}`);
+            this.dashboard.toastManager.showToast(
+                'error',
+                'Link Failed',
+                `Failed to initiate ${provider} linking: ${error.message}`
+            );
         } finally {
             this.dashboard.loadingManager.showLoading(false);
         }
     }
 
     async unlinkSocialProvider(provider) {
-        // ... this function remains unchanged
         const providerName = this.getProviderConfig(provider).name;
-        const confirmed = await this.dashboard.modalManager.showConfirm(`Are you sure you want to unlink your ${providerName} account?`, 'This will remove access via this social account.');
+        const confirmed = await this.dashboard.modalManager.showConfirm(
+            `Are you sure you want to unlink your ${providerName} account?`,
+            'This will remove access via this social account.'
+        );
+
         if (!confirmed) return;
+
         try {
             this.dashboard.loadingManager.showLoading(true);
-            this.dashboard.toastManager.showToast('info', 'Feature Unavailable', 'Account unlinking feature needs to be implemented on the backend');
+            // Use the new DELETE endpoint for unlinking
+            await this.dashboard.apiManager.makeRequest(`/api/users/social-accounts/${provider}`, {
+                method: 'DELETE'
+            });
+
+            this.dashboard.toastManager.showToast(
+                'success',
+                'Account Unlinked',
+                `${providerName} account has been unlinked successfully`
+            );
+
+            // Reload the accounts to reflect changes
+            await this.loadSocialAccounts();
+
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Unlink Failed', error.message || `Failed to unlink ${providerName} account`);
+            this.dashboard.toastManager.showToast(
+                'error',
+                'Unlink Failed',
+                error.message || `Failed to unlink ${providerName} account`
+            );
         } finally {
             this.dashboard.loadingManager.showLoading(false);
         }
     }
 
     async syncSocialProvider(provider) {
-        // ... this function remains unchanged
         const providerName = this.getProviderConfig(provider).name;
+
         try {
             const syncBtn = document.querySelector(`[data-provider="${provider}"].sync-account-btn`);
             if (syncBtn) {
                 syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 syncBtn.disabled = true;
             }
-            const response = await this.dashboard.apiManager.makeRequest(`/social-accounts/sync/${provider}`, { method: 'POST' });
-            this.dashboard.toastManager.showToast('success', 'Account Synced', `${providerName} account data has been synchronized`);
+
+            // Use the new sync endpoint
+            await this.dashboard.apiManager.makeRequest(`/api/users/social-accounts/sync/${provider}`, {
+                method: 'POST'
+            });
+
+            this.dashboard.toastManager.showToast(
+                'success',
+                'Account Synced',
+                `${providerName} account data has been synchronized`
+            );
+
             await this.loadSocialAccounts();
+
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Sync Failed', error.message || `Failed to sync ${providerName} account`);
+            this.dashboard.toastManager.showToast(
+                'error',
+                'Sync Failed',
+                error.message || `Failed to sync ${providerName} account`
+            );
+
             const syncBtn = document.querySelector(`[data-provider="${provider}"].sync-account-btn`);
             if (syncBtn) {
                 syncBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
@@ -596,20 +837,25 @@ class SecurityManager {
     }
 
     monitorAuthWindow(authWindow, provider) {
-        // ... this function remains unchanged
         const checkClosed = setInterval(() => {
             if (authWindow.closed) {
                 clearInterval(checkClosed);
                 setTimeout(async () => {
                     try {
                         await this.loadSocialAccounts();
-                        this.dashboard.toastManager.showToast('success', 'Account Linked', `${this.getProviderConfig(provider).name} account linking completed`);
+                        this.dashboard.toastManager.showToast(
+                            'success',
+                            'Account Linked',
+                            `${this.getProviderConfig(provider).name} account linking completed`
+                        );
                     } catch (error) {
                         console.error('Failed to reload after linking:', error);
                     }
                 }, 2000);
             }
         }, 1000);
+
+        // Auto-close after 10 minutes
         setTimeout(() => {
             clearInterval(checkClosed);
             if (!authWindow.closed) {
@@ -619,15 +865,19 @@ class SecurityManager {
     }
 
     handleRecommendationAction(action, data) {
-        // ... this function remains unchanged
         switch (action) {
             case 'set_password':
-                this.dashboard.toastManager.showToast('info', 'Security Tip', 'Consider setting a password for backup authentication');
+                this.dashboard.toastManager.showToast(
+                    'info',
+                    'Security Tip',
+                    'Consider setting a password for backup authentication'
+                );
                 break;
             case 'link_accounts':
-                const availableSection = document.querySelector('.available-providers-section');
-                if (availableSection) {
-                    availableSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const linkNewBtn = document.getElementById('linkNewAccountBtn');
+                if (linkNewBtn) {
+                    linkNewBtn.click();
+                    linkNewBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
                 break;
             case 'sync_accounts':
@@ -645,7 +895,11 @@ class SecurityManager {
             github: { name: 'GitHub', icon: 'fab fa-github', color: '#333333' },
             facebook: { name: 'Facebook', icon: 'fab fa-facebook-f', color: '#4267b2' }
         };
-        return configs[provider] || { name: provider.charAt(0).toUpperCase() + provider.slice(1), icon: 'fas fa-link', color: '#6c757d' };
+        return configs[provider] || {
+            name: provider.charAt(0).toUpperCase() + provider.slice(1),
+            icon: 'fas fa-link',
+            color: 'var(--text-muted)'
+        };
     }
 
     async unlinkSocial(provider) {
