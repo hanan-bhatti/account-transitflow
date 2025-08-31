@@ -115,7 +115,7 @@ class AuthManager {
                 this.uiManager.updateLoadingProgress(10, 'Connecting to server...');
             }
 
-            const response = await this.apiClient.call('/me/quick', 'GET', null, false);
+            const response = await this.apiClient.call('/me', 'GET', null, false);
 
             if (!this.isInitializing) {
                 this.uiManager.updateLoadingProgress(50, 'Verifying credentials...');
