@@ -70,35 +70,35 @@
                         <label for="remember-me" class="checkbox-label">Remember me for 30 days</label>
                     </div>
 
-                                    <button type="submit" class="btn btn-primary">Sign In</button>
-            </form>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                </form>
 
-            <!-- Social Authentication Section -->
-            <div class="social-auth-section">
-                <div class="social-divider">
-                    <span>or continue with</span>
+                <!-- Social Authentication Section -->
+                <div class="social-auth-section">
+                    <div class="social-divider">
+                        <span>or continue with</span>
+                    </div>
+                    <div class="social-buttons">
+                        <button type="button" class="btn btn-social btn-google" id="google-login">
+                            <i class="bx bxl-google"></i>
+                            Continue with Google
+                        </button>
+                        <button type="button" class="btn btn-social btn-facebook" id="facebook-login">
+                            <i class="bx bxl-facebook"></i>
+                            Continue with Facebook
+                        </button>
+                        <button type="button" class="btn btn-social btn-github" id="github-login">
+                            <i class="bx bxl-github"></i>
+                            Continue with GitHub
+                        </button>
+                    </div>
                 </div>
-                <div class="social-buttons">
-                    <button type="button" class="btn btn-social btn-google" id="google-login">
-                        <i class="bx bxl-google"></i>
-                        Continue with Google
-                    </button>
-                    <button type="button" class="btn btn-social btn-facebook" id="facebook-login">
-                        <i class="bx bxl-facebook"></i>
-                        Continue with Facebook
-                    </button>
-                    <button type="button" class="btn btn-social btn-github" id="github-login">
-                        <i class="bx bxl-github"></i>
-                        Continue with GitHub
-                    </button>
-                </div>
-            </div>
 
-                        <div class="auth-footer">
-                <p><a href="#" class="auth-link" id="show-forgot-password">Forgot your password?</a></p>
-                <p style="margin-top: 1rem;">Don't have an account? <a href="#" class="auth-link"
-                        id="show-register">Sign up</a></p>
-            </div>
+                <div class="auth-footer">
+                    <p><a href="#" class="auth-link" id="show-forgot-password">Forgot your password?</a></p>
+                    <p style="margin-top: 1rem;">Don't have an account? <a href="#" class="auth-link"
+                            id="show-register">Sign up</a></p>
+                </div>
             </div>
 
             <!-- 2FA Verification Form -->
@@ -240,9 +240,11 @@
                         </select>
                         <span class="form-error" id="user-type-error"></span>
                     </div>
-                    <p>By creating account, you agree to our <a href="https://policy.transitflow.qzz.io/terms" target="_blank" class="auth-link">Terms of
+                    <p>By creating account, you agree to our <a href="https://policy.transitflow.qzz.io/terms"
+                            target="_blank" class="auth-link">Terms of
                             Service</a> and
-                        <a href="https://policy.transitflow.qzz.io/privacy" target="_blank" class="auth-link">Privacy Policy</a>.
+                        <a href="https://policy.transitflow.qzz.io/privacy" target="_blank" class="auth-link">Privacy
+                            Policy</a>.
                     </p>
                     <button type="submit" class="btn btn-primary">Create Account</button>
                 </form>
@@ -315,6 +317,22 @@
 
         </div>
         <div id="toastContainer" class="toast-container"></div>
+        
+        <script>
+            (function (d, t) {
+                var BASE_URL = "https://chatwoot-production-5a33.up.railway.app";
+                var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+                g.src = BASE_URL + "/packs/js/sdk.js";
+                g.async = true;
+                s.parentNode.insertBefore(g, s);
+                g.onload = function () {
+                    window.chatwootSDK.run({
+                        websiteToken: 'Wf3jiwU8aae588BoBzmzN6Hp',
+                        baseUrl: BASE_URL
+                    })
+                }
+            })(document, "script");
+        </script>
 
         <!-- Core Dependencies (must be loaded first) -->
         <script src="/js/auth/services/ApiClient.js"></script>
