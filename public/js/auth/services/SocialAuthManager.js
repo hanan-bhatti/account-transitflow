@@ -1,4 +1,4 @@
-/ services/SocialAuthManager.js
+// services/SocialAuthManager.js
 class SocialAuthManager {
     constructor(config = {}) {
         this.config = {
