@@ -50,9 +50,10 @@ class SecurityManager {
             if (status.hasPendingDeletion) {
                 // User has pending deletion request
                 if (deleteAccountBtn) {
-                    deleteAccountBtn.textContent = 'Cancel Deletion Request';
                     deleteAccountBtn.className = 'btn btn-warning';
                     deleteAccountBtn.title = `Deletion expires: ${new Date(status.deletionTokenExpires).toLocaleString()}`;
+                    const dangerItem = document.querySelector('.danger-item');
+                    dangerItem.classList.add('display: none;');
                 }
 
                 // Show status information
@@ -63,6 +64,8 @@ class SecurityManager {
                     deleteAccountBtn.textContent = 'Request Account Deletion';
                     deleteAccountBtn.className = 'btn btn-danger';
                     deleteAccountBtn.title = 'Request account deletion via email';
+                    const dangerItem = document.querySelector('.danger-item');
+                    dangerItem.classList.remove('display: block;');
                 }
             }
 

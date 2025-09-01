@@ -742,11 +742,19 @@ textarea {
 
 .twofa-status,
 .social-accounts {
+  display: flex;
   space-y: 16px;
+  align-content: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
 .twofa-disabled,
 .twofa-enabled {
+  display: contents;
   padding: 24px;
   border-bottom-right-radius: 12px;
   border-bottom-left-radius: 12px;
@@ -4228,6 +4236,7 @@ textarea:focus {
 }
 
 .social-account-card {
+  display: contents;
   background: var(--card-bg, #fff);
   border: 1px solid var(--border-color, #e1e5e9);
   border-radius: 12px;
@@ -4406,6 +4415,7 @@ textarea:focus {
 
 /* Social Stats Section */
 .social-stats-section {
+  display: contents;
   background: var(--light-bg, #f8f9fa);
   border-radius: 12px;
   padding: 1rem;
