@@ -8,6 +8,8 @@
     <link rel="icon"
         href="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
         type="image/x-icon">
+    <script defer src="http://localhost:32768/script.js"
+        data-website-id="d1e811e0-9e3d-4983-bc9e-c673dd629791"></script>
     <style>
         :root {
             /* Default theme variables - will be overridden by dynamic theme */
@@ -442,17 +444,17 @@
         function extractTokenFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             let token = urlParams.get('token');
-            
+
             if (token) {
                 // Clean the token by removing any unwanted characters
                 token = token.trim()
                     .replace(/['"]/g, '') // Remove single and double quotes
                     .replace(/[^\w\d]/g, '') // Keep only alphanumeric characters
-                
+
                 console.log('Extracted token:', token); // For debugging
                 return token;
             }
-            
+
             // Also try to extract from hash if present
             const hash = window.location.hash;
             if (hash.includes('token=')) {
@@ -466,7 +468,7 @@
                     return token;
                 }
             }
-            
+
             return null;
         }
 
@@ -699,7 +701,7 @@
                 // Clean pasted text
                 pastedText = pastedText.replace(/['"]/g, '').replace(/[^\w\d]/g, '');
                 e.target.value = pastedText.substring(0, 10);
-                
+
                 if (pastedText.length >= 6) {
                     document.getElementById('password').focus();
                 }

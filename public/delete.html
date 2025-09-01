@@ -9,6 +9,8 @@
         href="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
         type="image/x-icon">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script defer src="http://localhost:32768/script.js"
+        data-website-id="d1e811e0-9e3d-4983-bc9e-c673dd629791"></script>
     <style>
         :root {
             /* Theme variables */
@@ -75,8 +77,13 @@
         }
 
         @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Main content wrapper */
@@ -155,18 +162,39 @@
         }
 
         @keyframes pulse-danger {
-            0%, 100% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            50% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(239, 68, 68, 0); }
+
+            0%,
+            100% {
+                box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(239, 68, 68, 0);
+            }
         }
 
         @keyframes pulse-success {
-            0%, 100% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            50% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(16, 185, 129, 0); }
+
+            0%,
+            100% {
+                box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(16, 185, 129, 0);
+            }
         }
 
         @keyframes pulse-primary {
-            0%, 100% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(59, 130, 246, 0.4); }
-            50% { box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(59, 130, 246, 0); }
+
+            0%,
+            100% {
+                box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 8px 25px -5px var(--shadow), 0 0 0 20px rgba(59, 130, 246, 0);
+            }
         }
 
         .page-title {
@@ -185,7 +213,8 @@
         }
 
         /* Content sections */
-        .user-info, .danger-zone {
+        .user-info,
+        .danger-zone {
             background: var(--bg-secondary);
             backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
@@ -396,6 +425,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -444,8 +474,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Theme indicator */
@@ -506,6 +541,7 @@
                 opacity: 0;
                 transform: translateY(-20px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -558,11 +594,13 @@
                 padding: 1rem 0;
             }
 
-            .brand-name, .page-title {
+            .brand-name,
+            .page-title {
                 font-size: 1.75rem;
             }
 
-            .logo, .status-icon {
+            .logo,
+            .status-icon {
                 width: 64px;
                 height: 64px;
             }
@@ -597,17 +635,20 @@
                 padding: 0.5rem;
             }
 
-            .brand-name, .page-title {
+            .brand-name,
+            .page-title {
                 font-size: 1.5rem;
             }
 
-            .form-input, .btn {
+            .form-input,
+            .btn {
                 font-size: 0.9rem;
             }
         }
 
         /* Print styles */
         @media print {
+
             body::before,
             body::after,
             .theme-indicator,
@@ -627,7 +668,7 @@
                 Enable Location
             </h3>
             <p>
-                We'd like to use your location to provide weather-based themes and better user experience. 
+                We'd like to use your location to provide weather-based themes and better user experience.
                 Your location data is not stored and only used for theming.
             </p>
             <div class="button-group">
@@ -663,7 +704,8 @@
                 </div>
                 <h2 class="page-title">Confirm Account Deletion</h2>
                 <p class="subtitle">
-                    You're about to permanently delete your account. This action cannot be undone and all your data will be lost forever.
+                    You're about to permanently delete your account. This action cannot be undone and all your data will
+                    be lost forever.
                 </p>
             </div>
 
@@ -696,20 +738,14 @@
 
                 <div class="form-group">
                     <label for="confirmText" class="form-label">Type "DELETE MY ACCOUNT" to confirm:</label>
-                    <input type="text" id="confirmText" name="confirmText" 
-                           class="form-input danger" 
-                           placeholder="DELETE MY ACCOUNT" 
-                           autocomplete="off"
-                           required>
+                    <input type="text" id="confirmText" name="confirmText" class="form-input danger"
+                        placeholder="DELETE MY ACCOUNT" autocomplete="off" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password" class="form-label">Enter your password to confirm:</label>
-                    <input type="password" id="password" name="password" 
-                           class="form-input"
-                           placeholder="Enter your password"
-                           autocomplete="current-password"
-                           required>
+                    <input type="password" id="password" name="password" class="form-input"
+                        placeholder="Enter your password" autocomplete="current-password" required>
                 </div>
 
                 <div class="loading-indicator" id="loading">
@@ -744,7 +780,7 @@
                 <h2 class="page-title">Account Deleted Successfully</h2>
                 <p class="subtitle">Your account has been permanently deleted from our systems.</p>
             </div>
-            
+
             <div class="alert success">
                 <i class="bx bx-check-circle alert-icon"></i>
                 <div>
@@ -776,7 +812,7 @@
                 <h2 class="page-title">Error</h2>
                 <p class="subtitle">Something went wrong with your request.</p>
             </div>
-            
+
             <div class="alert error">
                 <i class="bx bx-error alert-icon"></i>
                 <span id="error-message-text"></span>
@@ -810,7 +846,7 @@
                     Secure access to your TransitFlow account and services
                 </p>
             </div>
-            
+
             <div class="button-group">
                 <a href="/login" class="btn btn-primary">
                     <i class="bx bx-log-in"></i>
@@ -827,7 +863,7 @@
     <script>
         // API Configuration
         const API_BASE_URL = 'https://api-auth.transitflow.qzz.io/api';
-        
+
         // Global state
         let currentState = {
             userEmail: '',
@@ -839,7 +875,7 @@
         // Theme and location management (keeping original functionality)
         let currentTheme = null;
         let locationPermissionAsked = false;
-        
+
         const themeIndicator = document.getElementById('themeIndicator');
         const locationModal = document.getElementById('locationModal');
 
@@ -863,9 +899,9 @@
             } else {
                 themeIndicator.textContent = 'Default Theme';
             }
-            
+
             themeIndicator.classList.add('show');
-            
+
             // Auto-hide after 3 seconds
             setTimeout(() => {
                 themeIndicator.classList.remove('show');
@@ -892,7 +928,7 @@
             locationModal.style.display = 'none';
             locationPermissionAsked = true;
             localStorage.setItem('locationPermissionAsked', 'true');
-            
+
             try {
                 const position = await new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -901,7 +937,7 @@
                         maximumAge: 300000 // 5 minutes
                     });
                 });
-                
+
                 localStorage.setItem('locationAllowed', 'true');
                 await fetchThemeWithLocation(position.coords);
             } catch (error) {
@@ -916,7 +952,7 @@
             try {
                 const weatherResponse = await fetch(
                     `${API_BASE_URL}/weather?lat=${coords.latitude}&lon=${coords.longitude}`,
-                    { 
+                    {
                         credentials: 'include',
                         headers: {
                             'Accept': 'application/json',
@@ -977,7 +1013,7 @@
         function checkLocationPermission() {
             const permissionAsked = localStorage.getItem('locationPermissionAsked');
             const locationAllowed = localStorage.getItem('locationAllowed');
-            
+
             if (!permissionAsked) {
                 setTimeout(showLocationModal, 1500);
             } else if (locationAllowed === 'true' && navigator.geolocation) {
@@ -1006,7 +1042,7 @@
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
             });
-            
+
             // Show target section
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
@@ -1031,14 +1067,14 @@
             document.getElementById('user-email').textContent = data.userEmail;
             document.getElementById('user-name').textContent = data.userName;
             document.getElementById('deletion-token').value = data.deletionToken;
-            
+
             currentState.userEmail = data.userEmail;
             currentState.userName = data.userName;
             currentState.deletionToken = data.deletionToken;
-            
+
             showSection('confirm-deletion-section');
             document.getElementById('page-title').textContent = 'Confirm Deletion - TransitFlow';
-            
+
             // Auto-focus confirmation input
             setTimeout(() => {
                 document.getElementById('confirmText').focus();
@@ -1058,7 +1094,7 @@
                 });
 
                 const result = await response.json();
-                
+
                 if (result.success && result.data) {
                     return result.data;
                 } else {
@@ -1087,7 +1123,7 @@
                 });
 
                 const result = await response.json();
-                
+
                 if (!response.ok) {
                     throw new Error(result.message || 'Deletion failed');
                 }
@@ -1112,7 +1148,7 @@
             function validateForm() {
                 const confirmText = confirmInput.value.trim();
                 const password = passwordInput.value.trim();
-                
+
                 if (confirmText === 'DELETE MY ACCOUNT' && password.length > 0) {
                     deleteBtn.disabled = false;
                     deleteBtn.style.opacity = '1';
@@ -1137,20 +1173,20 @@
                 validateForm();
                 hideFormError();
             });
-            
+
             passwordInput.addEventListener('input', () => {
                 validateForm();
                 hideFormError();
             });
 
             // Handle form submission
-            form.addEventListener('submit', async function(e) {
+            form.addEventListener('submit', async function (e) {
                 e.preventDefault();
-                
+
                 if (deleteBtn.disabled) {
                     return;
                 }
-                
+
                 hideFormError();
                 loading.classList.add('show');
                 deleteBtn.disabled = true;
@@ -1158,7 +1194,7 @@
                     <div class="spinner" style="width: 16px; height: 16px; margin-right: 0.5rem;"></div>
                     Deleting...
                 `;
-                
+
                 // Disable all form inputs
                 const inputs = form.querySelectorAll('input, button');
                 inputs.forEach(input => input.disabled = true);
@@ -1171,7 +1207,7 @@
                     };
 
                     const result = await submitDeletion(formData);
-                    
+
                     if (result.success) {
                         if (result.data && result.data.isDeletionSuccess) {
                             showSuccess(result.data.userEmail || currentState.userEmail);
@@ -1184,7 +1220,7 @@
 
                 } catch (error) {
                     console.error('Form submission error:', error);
-                    
+
                     // Re-enable form
                     inputs.forEach(input => input.disabled = false);
                     loading.classList.remove('show');
@@ -1193,7 +1229,7 @@
                         Delete My Account
                     `;
                     validateForm();
-                    
+
                     // Show error message
                     showFormError(error.message || 'An error occurred while deleting your account. Please try again.');
                 }
@@ -1206,19 +1242,19 @@
         // Page initialization
         async function initializePage() {
             const params = getUrlParams();
-            
+
             if (params.success) {
                 // Handle success from URL parameter
                 showSuccess(params.email || 'your account');
                 return;
             }
-            
+
             if (params.error) {
                 // Handle error from URL parameter
                 showError(params.error, true);
                 return;
             }
-            
+
             if (params.token) {
                 // Handle deletion confirmation
                 try {
@@ -1231,7 +1267,7 @@
                 }
                 return;
             }
-            
+
             // Default state - show authentication options
             showSection('default-auth-section');
             document.getElementById('page-title').textContent = 'Authentication - TransitFlow';
@@ -1240,17 +1276,17 @@
         // Enhanced input animations (keeping original functionality)
         function setupInputAnimations() {
             document.querySelectorAll('.form-input').forEach(input => {
-                input.addEventListener('focus', function() {
+                input.addEventListener('focus', function () {
                     this.parentElement.style.transform = 'translateY(-2px)';
                     this.parentElement.style.transition = 'transform 0.2s ease';
                 });
 
-                input.addEventListener('blur', function() {
+                input.addEventListener('blur', function () {
                     this.parentElement.style.transform = 'translateY(0)';
                 });
 
                 // Add input validation feedback
-                input.addEventListener('input', function() {
+                input.addEventListener('input', function () {
                     if (this.validity.valid) {
                         this.style.borderColor = 'var(--success)';
                     } else if (this.value.length > 0) {
@@ -1266,20 +1302,20 @@
         function setupButtonAnimations() {
             document.querySelectorAll('.btn').forEach(btn => {
                 // Add ripple effect on click
-                btn.addEventListener('click', function(e) {
+                btn.addEventListener('click', function (e) {
                     const ripple = document.createElement('span');
                     const rect = this.getBoundingClientRect();
                     const size = Math.max(rect.width, rect.height);
                     const x = e.clientX - rect.left - size / 2;
                     const y = e.clientY - rect.top - size / 2;
-                    
+
                     ripple.style.width = ripple.style.height = size + 'px';
                     ripple.style.left = x + 'px';
                     ripple.style.top = y + 'px';
                     ripple.classList.add('ripple');
-                    
+
                     this.appendChild(ripple);
-                    
+
                     setTimeout(() => {
                         ripple.remove();
                     }, 600);
@@ -1350,7 +1386,7 @@
         // Error handling and retry logic
         function handleNetworkError(error, retryCallback, maxRetries = 3, currentRetry = 0) {
             console.error(`Network error (attempt ${currentRetry + 1}/${maxRetries}):`, error);
-            
+
             if (currentRetry < maxRetries - 1) {
                 const delay = Math.pow(2, currentRetry) * 1000; // Exponential backoff
                 setTimeout(() => {
@@ -1371,7 +1407,7 @@
 
             // Initialize accessibility enhancements
             enhanceAccessibility();
-            
+
             // Setup animations
             setupInputAnimations();
             setupButtonAnimations();
@@ -1384,13 +1420,13 @@
         }
 
         // Event listeners for modal and keyboard navigation
-        locationModal.addEventListener('click', function(e) {
+        locationModal.addEventListener('click', function (e) {
             if (e.target === this) {
                 dismissLocationModal();
             }
         });
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (locationModal.style.display === 'flex') {
                 if (e.key === 'Escape') {
                     dismissLocationModal();
@@ -1404,7 +1440,7 @@
         });
 
         // Page visibility handling for better performance
-        document.addEventListener('visibilitychange', function() {
+        document.addEventListener('visibilitychange', function () {
             if (document.hidden) {
                 document.querySelectorAll('.status-icon').forEach(icon => {
                     icon.style.animationPlayState = 'paused';
@@ -1413,7 +1449,7 @@
                 document.querySelectorAll('.status-icon').forEach(icon => {
                     icon.style.animationPlayState = 'running';
                 });
-                
+
                 const lastThemeUpdate = sessionStorage.getItem('lastThemeUpdate');
                 if (lastThemeUpdate && Date.now() - parseInt(lastThemeUpdate) > 5 * 60 * 1000) {
                     checkLocationPermission();
@@ -1423,13 +1459,13 @@
 
         // Update last theme update timestamp
         const originalApplyTheme = applyTheme;
-        applyTheme = function(theme) {
+        applyTheme = function (theme) {
             originalApplyTheme(theme);
             sessionStorage.setItem('lastThemeUpdate', Date.now().toString());
         };
 
         // Handle browser back/forward navigation
-        window.addEventListener('pageshow', function(event) {
+        window.addEventListener('pageshow', function (event) {
             if (event.persisted) {
                 const loadingIndicators = document.querySelectorAll('.loading-indicator');
                 loadingIndicators.forEach(indicator => {
