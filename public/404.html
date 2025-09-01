@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Page Not Found | TransitFlow</title>
-    <link rel="icon" href="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj" type="image/x-icon">
+    <link rel="icon"
+        href="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+        type="image/x-icon">
+    <script defer src="https://letstrack-five.vercel.app/script.js"
+        data-website-id="e854b045-2569-4172-a4c0-b8fcb47c5c23"></script>
     <style>
         * {
             margin: 0;
@@ -184,7 +189,7 @@
             .error-code {
                 font-size: 48px;
             }
-            
+
             .title {
                 font-size: 20px;
             }
@@ -199,13 +204,15 @@
         }
     </style>
 </head>
+
 <body>
-    <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj" alt="TransitFlow" class="logo">
-    
+    <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+        alt="TransitFlow" class="logo">
+
     <div class="error-code">404</div>
     <h1 class="title">This page isn't available</h1>
     <p class="subtitle">The page you requested cannot be found. But legends know the way...</p>
-    
+
     <div class="actions">
         <a href="/" class="btn btn-primary">Go home</a>
         <button onclick="history.back()" class="btn">Go back</button>
@@ -214,30 +221,30 @@
     <!-- Konami Code Legendary Mode -->
     <div id="legendaryMode" class="legendary-mode hidden">
         <div class="matrix-bg" id="matrixBg"></div>
-        
+
         <div class="legendary-title">LEGENDARY MODE ACTIVATED</div>
         <div class="legendary-subtitle">The Konami Code Master Has Arrived</div>
-        
+
         <div class="legendary-ascii">
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-    ░░█▀▀░█▀█░█▀▄░█▀▀░░░█▀▄░█▀█░█▀▀░█▀▀░░
-    ░░█░░░█░█░█░█░█▀▀░░░█▀▄░█░█░▀▀█░▀▀█░░
-    ░░▀▀▀░▀▀▀░▀▀░░▀▀▀░░░▀▀░░▀▀▀░▀▀▀░▀▀▀░░
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+            ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+            ░░█▀▀░█▀█░█▀▄░█▀▀░░░█▀▄░█▀█░█▀▀░█▀▀░░
+            ░░█░░░█░█░█░█░█▀▀░░░█▀▄░█░█░▀▀█░▀▀█░░
+            ░░▀▀▀░▀▀▀░▀▀░░▀▀▀░░░▀▀░░▀▀▀░▀▀▀░▀▀▀░░
+            ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
         </div>
-        
+
         <div class="legendary-message">
             You have unlocked the ancient power of the Konami Code!<br><br>
-            
+
             ↑ ↑ ↓ ↓ ← → ← → B A<br><br>
-            
+
             This legendary sequence has granted 30 lives to countless warriors since 1986.<br>
             You are now part of gaming history, a keeper of the sacred code.<br><br>
-            
+
             <strong>LEGENDARY STATUS: UNLOCKED</strong><br>
             Welcome to the ranks of true gamers.
         </div>
-        
+
         <button class="legendary-close" onclick="closeLegendaryMode()">EXIT LEGENDARY MODE</button>
     </div>
 
@@ -245,10 +252,10 @@
         // Konami Code Implementation
         let konamiSequence = [];
         const konamiCode = [
-            'ArrowUp', 'ArrowUp', 
-            'ArrowDown', 'ArrowDown', 
-            'ArrowLeft', 'ArrowRight', 
-            'ArrowLeft', 'ArrowRight', 
+            'ArrowUp', 'ArrowUp',
+            'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight',
+            'ArrowLeft', 'ArrowRight',
             'KeyB', 'KeyA'
         ];
 
@@ -257,20 +264,20 @@
             const matrixBg = document.getElementById('matrixBg');
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~`';
             const columns = Math.floor(window.innerWidth / 20);
-            
+
             for (let i = 0; i < columns; i++) {
                 const column = document.createElement('div');
                 column.className = 'matrix-column';
                 column.style.left = i * 20 + 'px';
                 column.style.animationDuration = (Math.random() * 3 + 2) + 's';
                 column.style.animationDelay = Math.random() * 2 + 's';
-                
+
                 let text = '';
                 for (let j = 0; j < 50; j++) {
                     text += chars[Math.floor(Math.random() * chars.length)] + '\n';
                 }
                 column.textContent = text;
-                
+
                 // Animate the column
                 let position = -100;
                 const animate = () => {
@@ -284,7 +291,7 @@
                     }
                 };
                 setTimeout(animate, Math.random() * 2000);
-                
+
                 matrixBg.appendChild(column);
             }
         }
@@ -293,11 +300,11 @@
             const legendaryMode = document.getElementById('legendaryMode');
             legendaryMode.classList.remove('hidden');
             createMatrixRain();
-            
+
             // Play legendary sound effect (if you want to add audio)
             console.log('🎮 LEGENDARY MODE ACTIVATED! 🎮');
             console.log('The ancient Konami Code has been honored!');
-            
+
             // Reset sequence
             konamiSequence = [];
         }
@@ -305,20 +312,20 @@
         function closeLegendaryMode() {
             const legendaryMode = document.getElementById('legendaryMode');
             const matrixBg = document.getElementById('matrixBg');
-            
+
             legendaryMode.classList.add('hidden');
             matrixBg.innerHTML = ''; // Clear matrix rain
         }
 
         // Konami Code Listener
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             konamiSequence.push(e.code);
-            
+
             // Keep only the last 10 keys
             if (konamiSequence.length > 10) {
                 konamiSequence.shift();
             }
-            
+
             // Check if sequence matches Konami code
             if (konamiSequence.length === 10) {
                 const matches = konamiSequence.every((key, index) => key === konamiCode[index]);
@@ -329,11 +336,12 @@
         });
 
         // Escape key to close legendary mode
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.code === 'Escape') {
                 closeLegendaryMode();
             }
         });
     </script>
 </body>
+
 </html>
