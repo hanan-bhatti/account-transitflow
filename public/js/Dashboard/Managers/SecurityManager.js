@@ -50,10 +50,9 @@ class SecurityManager {
             if (status.hasPendingDeletion) {
                 // User has pending deletion request
                 if (deleteAccountBtn) {
+                    deleteAccountBtn.textContent = 'Cancel Deletion Request';
                     deleteAccountBtn.className = 'btn btn-warning';
                     deleteAccountBtn.title = `Deletion expires: ${new Date(status.deletionTokenExpires).toLocaleString()}`;
-                    const dangerItem = document.querySelector('.danger-item');
-                    dangerItem.classList.add('display: none;');
                 }
 
                 // Show status information
@@ -64,8 +63,6 @@ class SecurityManager {
                     deleteAccountBtn.textContent = 'Request Account Deletion';
                     deleteAccountBtn.className = 'btn btn-danger';
                     deleteAccountBtn.title = 'Request account deletion via email';
-                    const dangerItem = document.querySelector('.danger-item');
-                    dangerItem.classList.remove('display: block;');
                 }
             }
 
@@ -78,17 +75,26 @@ class SecurityManager {
         const dangerZone = document.querySelector('.danger-zone');
         if (!dangerZone) return;
 
+        // Remove existing alert if present
         const existingAlert = dangerZone.querySelector('.deletion-pending-alert');
         if (existingAlert) {
             existingAlert.remove();
         }
 
+        // Find and hide/remove the original danger-item
+        const dangerItem = dangerZone.querySelector('.danger-item');
+        if (dangerItem) {
+            dangerItem.style.display = 'none'; // or dangerItem.remove() to completely remove
+        }
+
         const timeRemaining = Math.max(0, new Date(status.deletionTokenExpires) - new Date());
         const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
 
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'deletion-pending-alert alert alert-warning';
-        alertDiv.innerHTML = `
+        // Create new pending deletion content
+        const pendingDiv = document.createElement('div');
+        pendingDiv.className = 'deletion-pending-content';
+        pendingDiv.innerHTML = `
+        <div class="deletion-pending-alert alert alert-warning">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <h5><i class="fas fa-clock"></i> Account Deletion Pending</h5>
@@ -98,17 +104,49 @@ class SecurityManager {
                     </p>
                     <small class="text-muted">Check your email for the confirmation link.</small>
                 </div>
-                <button class="btn btn-sm btn-outline-warning" id="cancelDeletionBtn">
-                    Cancel Request
+            </div>
+        </div>
+        <div class="danger-item">
+            <div class="danger-info">
+                <h4>
+                    <i class="fas fa-hourglass-half"></i>
+                    Deletion Request Pending
+                </h4>
+                <p>Your account deletion is pending confirmation. Check your email or cancel the request below.</p>
+            </div>
+            <div class="danger-actions">
+                <button class="btn btn-warning" id="cancelDeletionBtn">
+                    <i class="fas fa-times"></i>
+                    Cancel Deletion Request
+                </button>
+                <button class="btn btn-outline-secondary" id="resendDeletionBtn" ${hoursRemaining > 0 ? 'disabled' : ''}>
+                    <i class="fas fa-envelope"></i>
+                    ${hoursRemaining > 0 ? 'Resend Available After Expiry' : 'Resend Confirmation Email'}
                 </button>
             </div>
-        `;
+        </div>
+    `;
 
-        dangerZone.insertBefore(alertDiv, dangerZone.firstChild);
+        dangerZone.appendChild(pendingDiv);
 
-        // Add event listener for cancel button
+        // Add event listeners for new buttons
         const cancelBtn = document.getElementById('cancelDeletionBtn');
-        this.addTrackedEventListener(cancelBtn, 'click', () => this.cancelDeletionRequest());
+        const resendBtn = document.getElementById('resendDeletionBtn');
+
+        if (cancelBtn) {
+            this.addTrackedEventListener(cancelBtn, 'click', () => this.cancelDeletionRequest());
+        }
+
+        if (resendBtn) {
+            this.addTrackedEventListener(resendBtn, 'click', () => {
+                if (hoursRemaining > 0) {
+                    this.dashboard.toastManager.showToast('warning', 'Cannot Resend Yet',
+                        `You must wait ${hoursRemaining} more hour${hoursRemaining !== 1 ? 's' : ''} before requesting a new deletion link.`);
+                } else {
+                    this.resendDeletionEmail();
+                }
+            });
+        }
     }
 
     initializeDeletionControls() {
@@ -172,6 +210,22 @@ class SecurityManager {
 
     async requestAccountDeletionEmail() {
         try {
+            // First check current deletion status
+            const statusResponse = await this.dashboard.apiManager.makeRequest('/deletion-status');
+            const status = statusResponse.data;
+
+            // If there's already a pending deletion that hasn't expired, don't allow new request
+            if (status.hasPendingDeletion) {
+                const timeRemaining = Math.max(0, new Date(status.deletionTokenExpires) - new Date());
+
+                if (timeRemaining > 0) {
+                    const hoursRemaining = Math.ceil(timeRemaining / (1000 * 60 * 60));
+                    this.dashboard.toastManager.showToast('warning', 'Deletion Already Pending',
+                        `You already have a pending deletion request. You can request a new one in ${hoursRemaining} hour${hoursRemaining !== 1 ? 's' : ''}.`);
+                    return;
+                }
+            }
+
             const password = await this.getPasswordForDeletion();
             if (!password) return;
 
@@ -182,35 +236,49 @@ class SecurityManager {
                 body: JSON.stringify({ password })
             });
 
-            // Check if there's already a pending deletion request
-            if (response.data && response.data.deletionRequestedAt) {
-                // Calculate when user can request new deletion
-                const expirationDate = new Date(response.data.deletionTokenExpires);
-                const now = new Date();
-                const timeRemaining = expirationDate - now;
-
-                let timeMessage = '';
-                if (timeRemaining > 0) {
-                    const hoursRemaining = Math.ceil(timeRemaining / (1000 * 60 * 60));
-                    timeMessage = ` You can request a new deletion in ${hoursRemaining} hour${hoursRemaining !== 1 ? 's' : ''}.`;
-                } else {
-                    timeMessage = ' You can request a new deletion now.';
-                }
-
-                this.dashboard.toastManager.showToast('error', 'Deletion Already Pending',
-                    response.message + timeMessage);
-            } else {
-                // Normal success case
-                this.dashboard.toastManager.showToast('success', 'Deletion Requested',
-                    'Please check your email for confirmation instructions. The link will expire in 24 hours.');
-            }
+            this.dashboard.toastManager.showToast('success', 'Deletion Requested',
+                'Please check your email for confirmation instructions. The link will expire in 24 hours.');
 
             // Reload deletion status to show pending state
             await this.loadDeletionStatus();
 
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Request Failed',
-                error.message || 'Failed to request account deletion');
+            // Handle specific error cases
+            if (error.message && error.message.includes('pending')) {
+                this.dashboard.toastManager.showToast('warning', 'Cannot Request Deletion',
+                    'You must wait for your current deletion request to expire before requesting a new one.');
+            } else {
+                this.dashboard.toastManager.showToast('error', 'Request Failed',
+                    error.message || 'Failed to request account deletion');
+            }
+        } finally {
+            this.dashboard.loadingManager.showLoading(false);
+        }
+    }
+
+    async resendDeletionEmail() {
+        try {
+            this.dashboard.loadingManager.showLoading(true);
+
+            const response = await this.dashboard.apiManager.makeRequest('/resend-deletion-email', {
+                method: 'POST'
+            });
+
+            this.dashboard.toastManager.showToast('success', 'Email Sent',
+                'Deletion confirmation email has been resent. Please check your inbox.');
+
+            // Reload deletion status to update the UI with new expiry time
+            await this.loadDeletionStatus();
+
+        } catch (error) {
+            // Handle case where user tries to resend before expiry
+            if (error.message && error.message.includes('pending')) {
+                this.dashboard.toastManager.showToast('warning', 'Cannot Resend Yet',
+                    'You must wait for the current deletion request to expire before requesting a new one.');
+            } else {
+                this.dashboard.toastManager.showToast('error', 'Failed to Resend',
+                    error.message || 'Failed to resend deletion confirmation email');
+            }
         } finally {
             this.dashboard.loadingManager.showLoading(false);
         }
