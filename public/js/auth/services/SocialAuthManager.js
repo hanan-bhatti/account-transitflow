@@ -299,7 +299,8 @@ class SocialAuthManager {
         // Verify origin for security
         const allowedOrigins = [
             'https://api-auth.transitflow.qzz.io',
-            'https://account.transitflow.qzz.io'
+            'https://account.transitflow.qzz.io',
+            'https://chatwoot-production-5a33.up.railway.app'
         ];
 
         if (!allowedOrigins.includes(event.origin)) {
