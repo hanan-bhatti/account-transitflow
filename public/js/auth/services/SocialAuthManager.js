@@ -2,7 +2,7 @@
 class SocialAuthManager {
     constructor(config = {}) {
         this.config = {
-            apiBbaseUrl_social: 'https://api-auth.transitflow.qzz.io/api/users',
+            apiBaseUrl_social: 'https://api-auth.transitflow.qzz.io/api/users',
             frontendBaseUrl: 'https://account.transitflow.qzz.io',
             popupWidth: 500,
             popupHeight: 600,
@@ -11,7 +11,7 @@ class SocialAuthManager {
             maxRetries: 3,
             retryDelay: 1500,
             // Add grace period for message processing
-            messageGracePeriod: 2000, // 2 seconds
+            messageGracePeriod: 4000, // 4 seconds
             ...config
         };
 
@@ -22,12 +22,12 @@ class SocialAuthManager {
         this.pollTimer = null;
         this.currentProvider = null;
         this.retryCount = 0;
-        
+
         // Add flags to track auth state
         this.authInProgress = false;
         this.messageReceived = false;
         this.authResolved = false;
-        
+
         this.supportedProviders = ['google', 'facebook', 'apple', 'github', 'twitter', 'linkedin'];
         this.providerConfig = {
             google: {
@@ -68,14 +68,14 @@ class SocialAuthManager {
         this.authManager = authManager;
         this.uiManager = uiManager;
         this.networkManager = networkManager;
-        
+
         // Bind methods to preserve context
         this.handleLogin = this.handleLogin.bind(this);
         this.handlePopupMessage = this.handlePopupMessage.bind(this);
-        
+
         this.setupEventListeners();
         this.handleUrlParameters();
-        
+
         console.log('SocialAuthManager initialized successfully');
     }
 
@@ -186,17 +186,17 @@ class SocialAuthManager {
     // Get OAuth URL from backend (login only)
     async getOAuthUrl(provider, redirectUri = null) {
         const params = new URLSearchParams();
-        
+
         // Always set action to login (default behavior)
         params.append('action', 'login');
-        
+
         if (redirectUri) {
             params.append('redirect_uri', redirectUri);
         }
 
         const queryString = params.toString() ? '?' + params.toString() : '';
-        const url = `${this.config.apiBbaseUrl_social}/social/${provider}${queryString}`;
-        
+        const url = `${this.config.apiBaseUrl_social}/social/${provider}${queryString}`;
+
         try {
             const response = await fetch(url, {
                 method: 'GET',
@@ -213,7 +213,7 @@ class SocialAuthManager {
             }
 
             const data = await response.json();
-            
+
             if (!data.success) {
                 throw new Error(data.message || data.error || 'Failed to get OAuth URL');
             }
@@ -299,7 +299,7 @@ class SocialAuthManager {
                         }
                     }, this.config.messageGracePeriod);
                 }
-                
+
                 // Stop polling immediately since popup is closed
                 if (this.pollTimer) {
                     clearInterval(this.pollTimer);
@@ -317,7 +317,7 @@ class SocialAuthManager {
         }
 
         this.cleanup();
-        
+
         if (this.authPromise) {
             this.authPromise.reject(new Error('Authentication cancelled by user'));
             this.authPromise = null;
@@ -345,7 +345,7 @@ class SocialAuthManager {
         }
 
         const data = event.data;
-        
+
         // Mark that we received a message
         this.messageReceived = true;
 
@@ -359,48 +359,24 @@ class SocialAuthManager {
 
     // Handle successful OAuth login
     async handleLoginSuccess(data) {
-        try {
-            // Mark auth as resolved to prevent race conditions
-            this.authResolved = true;
-            
-            this.cleanup();
+        this.authResolved = true;
+        this.cleanup();
 
-            // The actual redirect happens in the popup, but we can show success message
-            this.uiManager?.showToast(
-                `Successfully logged in with ${this.getProviderName(data.provider)}!`,
-                'success'
-            );
+        this.uiManager?.showToast(
+            `Successfully logged in with ${this.getProviderName(data.provider)}!`,
+            'success'
+        );
 
-            // Emit event for successful login
-            this.emitEvent('loginSuccess', {
-                provider: data.provider,
-                message: data.message,
-                loginMethod: 'social'
-            });
-
-            if (this.authPromise) {
-                this.authPromise.resolve(data);
-                this.authPromise = null;
-            }
-
-            // Close popup explicitly before redirect
-            if (this.popupWindow && !this.popupWindow.closed) {
-                try {
-                    this.popupWindow.close();
-                } catch (e) {
-                    // Popup might already be closed
-                }
-            }
-
-            // Redirect parent window after a short delay
-            setTimeout(() => {
-                window.location.href = `${this.config.frontendBaseUrl}/dashboard`;
-            }, 1000);
-
-        } catch (error) {
-            console.error('Error handling OAuth success:', error);
-            this.handleSocialError(error, data.provider);
+        if (this.authPromise) {
+            this.authPromise.resolve(data);
+            this.authPromise = null;
         }
+
+        const redirectUrl = data.redirectUrl || `${this.config.frontendBaseUrl}/dashboard`;
+
+        setTimeout(() => {
+            window.location.href = redirectUrl;
+        }, 1500);
     }
 
     // Handle OAuth errors with detailed error mapping
@@ -491,7 +467,7 @@ class SocialAuthManager {
         console.error(`Social auth error (${provider}):`, error);
 
         let errorType = 'TOKEN_EXCHANGE_FAILED';
-        
+
         // Map specific errors
         if (error.message.includes('popup') || error.message.includes('blocked')) {
             errorType = 'POPUP_BLOCKED';
@@ -519,9 +495,9 @@ class SocialAuthManager {
                 return { message: text || 'Unknown error occurred' };
             }
         } catch (parseError) {
-            return { 
+            return {
                 message: `HTTP ${response.status}: ${response.statusText}`,
-                status: response.status 
+                status: response.status
             };
         }
     }
@@ -541,7 +517,7 @@ class SocialAuthManager {
 
     setButtonLoading(provider, isLoading) {
         const button = document.getElementById(`${provider}-login`);
-        
+
         if (!button) return;
 
         if (isLoading) {
@@ -576,9 +552,9 @@ class SocialAuthManager {
             'TIMEOUT'
         ];
 
-        return retryableErrors.some(retryError => 
-            error.name === retryError || 
-            error.type === retryError || 
+        return retryableErrors.some(retryError =>
+            error.name === retryError ||
+            error.type === retryError ||
             error.message.toLowerCase().includes(retryError.toLowerCase()) ||
             error.message.includes('fetch')
         );
@@ -588,7 +564,7 @@ class SocialAuthManager {
     async retryWithBackoff(operation) {
         this.retryCount++;
         const delay = this.config.retryDelay * Math.pow(2, this.retryCount - 1);
-        
+
         this.uiManager?.showToast(
             `Connection failed. Retrying in ${Math.round(delay / 1000)} seconds... (${this.retryCount}/${this.config.maxRetries})`,
             'warning'
@@ -615,7 +591,7 @@ class SocialAuthManager {
                 // Popup might already be closed or inaccessible
             }
         }
-        
+
         if (this.pollTimer) {
             clearInterval(this.pollTimer);
             this.pollTimer = null;
@@ -646,7 +622,7 @@ class SocialAuthManager {
         this.authResolved = false;
         window.removeEventListener('message', this.handlePopupMessage);
         window.removeEventListener('beforeunload', this.cleanup);
-        document.removeEventListener('visibilitychange', () => {});
+        document.removeEventListener('visibilitychange', () => { });
     }
 
     // Public API methods for external integration
@@ -663,8 +639,8 @@ class SocialAuthManager {
 
     // Check if provider is available/configured
     isProviderAvailable(provider) {
-        return this.supportedProviders.includes(provider) && 
-               this.providerConfig[provider];
+        return this.supportedProviders.includes(provider) &&
+            this.providerConfig[provider];
     }
 
     // Get all available providers
