@@ -10,6 +10,8 @@ class SocialAuthManager {
             pollInterval: 1000,
             maxRetries: 3,
             retryDelay: 1500,
+            // Add grace period for message processing
+            messageGracePeriod: 2000, // 2 seconds
             ...config
         };
 
@@ -20,6 +22,11 @@ class SocialAuthManager {
         this.pollTimer = null;
         this.currentProvider = null;
         this.retryCount = 0;
+        
+        // Add flags to track auth state
+        this.authInProgress = false;
+        this.messageReceived = false;
+        this.authResolved = false;
         
         this.supportedProviders = ['google', 'facebook', 'apple', 'github', 'twitter', 'linkedin'];
         this.providerConfig = {
@@ -95,10 +102,10 @@ class SocialAuthManager {
 
         // Handle visibility change (tab switching)
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden && this.popupWindow) {
+            if (document.hidden && this.popupWindow && !this.popupWindow.closed) {
                 // User switched tabs, show a toast reminder
                 setTimeout(() => {
-                    if (this.popupWindow && !this.popupWindow.closed) {
+                    if (this.popupWindow && !this.popupWindow.closed && this.authInProgress) {
                         this.uiManager?.showToast(
                             'Please complete the authentication in the popup window',
                             'info'
@@ -146,6 +153,9 @@ class SocialAuthManager {
         try {
             this.currentProvider = provider;
             this.retryCount = 0;
+            this.authInProgress = true;
+            this.messageReceived = false;
+            this.authResolved = false;
 
             // Show loading state
             this.setButtonLoading(provider, true);
@@ -169,6 +179,7 @@ class SocialAuthManager {
             this.handleSocialError(error, provider);
         } finally {
             this.setButtonLoading(provider, false);
+            this.authInProgress = false;
         }
     }
 
@@ -253,8 +264,10 @@ class SocialAuthManager {
 
                 // Set timeout for authentication
                 const timeout = setTimeout(() => {
-                    this.cleanup();
-                    reject(new Error('Authentication timed out. Please try again.'));
+                    if (!this.authResolved) {
+                        this.cleanup();
+                        reject(new Error('Authentication timed out. Please try again.'));
+                    }
                 }, this.config.popupTimeout);
 
                 // Store resolve/reject for message handler
@@ -277,13 +290,32 @@ class SocialAuthManager {
 
         this.pollTimer = setInterval(() => {
             if (!this.popupWindow || this.popupWindow.closed) {
-                this.handlePopupClosure();
+                // Add grace period to allow message processing
+                if (!this.messageReceived && !this.authResolved) {
+                    // Give a small grace period for the message to arrive
+                    setTimeout(() => {
+                        if (!this.messageReceived && !this.authResolved) {
+                            this.handlePopupClosure();
+                        }
+                    }, this.config.messageGracePeriod);
+                }
+                
+                // Stop polling immediately since popup is closed
+                if (this.pollTimer) {
+                    clearInterval(this.pollTimer);
+                    this.pollTimer = null;
+                }
             }
         }, this.config.pollInterval);
     }
 
     // Handle popup window closure (user cancelled)
     handlePopupClosure() {
+        // Only handle closure if auth hasn't been resolved yet
+        if (this.authResolved) {
+            return;
+        }
+
         this.cleanup();
         
         if (this.authPromise) {
@@ -308,11 +340,14 @@ class SocialAuthManager {
             return;
         }
 
-        if (!this.authPromise) {
+        if (!this.authPromise || this.authResolved) {
             return;
         }
 
         const data = event.data;
+        
+        // Mark that we received a message
+        this.messageReceived = true;
 
         // Handle different message types from the unified OAuth flow
         if (data.type === 'social-auth-success' && data.action === 'login') {
@@ -325,6 +360,9 @@ class SocialAuthManager {
     // Handle successful OAuth login
     async handleLoginSuccess(data) {
         try {
+            // Mark auth as resolved to prevent race conditions
+            this.authResolved = true;
+            
             this.cleanup();
 
             // The actual redirect happens in the popup, but we can show success message
@@ -345,10 +383,19 @@ class SocialAuthManager {
                 this.authPromise = null;
             }
 
-            // Close popup and redirect parent window
+            // Close popup explicitly before redirect
+            if (this.popupWindow && !this.popupWindow.closed) {
+                try {
+                    this.popupWindow.close();
+                } catch (e) {
+                    // Popup might already be closed
+                }
+            }
+
+            // Redirect parent window after a short delay
             setTimeout(() => {
                 window.location.href = `${this.config.frontendBaseUrl}/dashboard`;
-            }, 1500);
+            }, 1000);
 
         } catch (error) {
             console.error('Error handling OAuth success:', error);
@@ -358,6 +405,9 @@ class SocialAuthManager {
 
     // Handle OAuth errors with detailed error mapping
     handleOAuthError(error, provider, errorCode = null) {
+        // Mark auth as resolved to prevent race conditions
+        this.authResolved = true;
+
         const errorMessages = {
             'OAUTH_PROVIDER_ERROR': `${this.getProviderName(provider)} access was denied or failed. Please try again.`,
             'MISSING_AUTH_CODE': `Authentication with ${this.getProviderName(provider)} failed. Please try again.`,
@@ -578,6 +628,8 @@ class SocialAuthManager {
         this.popupWindow = null;
         this.currentProvider = null;
         this.retryCount = 0;
+        this.messageReceived = false;
+        // Don't reset authResolved here to prevent race conditions
     }
 
     // Clean up URL parameters
@@ -591,6 +643,7 @@ class SocialAuthManager {
     // Destroy method for complete cleanup
     destroy() {
         this.cleanup();
+        this.authResolved = false;
         window.removeEventListener('message', this.handlePopupMessage);
         window.removeEventListener('beforeunload', this.cleanup);
         document.removeEventListener('visibilitychange', () => {});
@@ -630,7 +683,7 @@ class SocialAuthManager {
 
     // Check if currently processing authentication
     isAuthenticating() {
-        return !!(this.popupWindow && !this.popupWindow.closed);
+        return this.authInProgress && !!(this.popupWindow && !this.popupWindow.closed);
     }
 
     // Manual trigger for specific provider (programmatic usage)
