@@ -33,6 +33,18 @@ class FormValidator {
         return /^[a-zA-Z\s'-]{1,50}$/.test(name);
     }
 
+    isValidAge(dateString) {
+        if (!dateString) return false;
+        const today = new Date();
+        const birthDate = new Date(dateString);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 13;
+    }
+
     validateForm(form) {
         const inputs = form.querySelectorAll('input[required], select[required]');
         let isValid = true;
@@ -71,6 +83,9 @@ class FormValidator {
             isValid = false;
         } else if ((name === 'firstName' || name === 'lastName') && value && !this.isValidName(value)) {
             errorMessage = 'Name can only contain letters, spaces, hyphens, and apostrophes';
+            isValid = false;
+        } else if (name === 'dateOfBirth' && value && !this.isValidAge(value)) {
+            errorMessage = 'You must be at least 13 years old to register';
             isValid = false;
         } else if (name === 'otp' && value && !/^\d{6}$/.test(value)) {
             errorMessage = 'Please enter a valid 6-digit code';
@@ -183,5 +198,36 @@ class FormValidator {
         }
 
         input.value = value;
+    }
+
+    validateStep(stepNumber) {
+        let isValid = true;
+        let fieldsToValidate = [];
+
+        switch (stepNumber) {
+            case 1:
+                fieldsToValidate = ['first-name', 'last-name'];
+                break;
+            case 2:
+                fieldsToValidate = ['date-of-birth', 'username'];
+                break;
+            case 3:
+                fieldsToValidate = ['email', 'phone'];
+                break;
+            case 4:
+                fieldsToValidate = ['password', 'user-type'];
+                break;
+            default:
+                return true; // No validation for other steps
+        }
+
+        fieldsToValidate.forEach(fieldId => {
+            const input = document.getElementById(fieldId);
+            if (input && !this.validateField(input)) {
+                isValid = false;
+            }
+        });
+
+        return isValid;
     }
 }

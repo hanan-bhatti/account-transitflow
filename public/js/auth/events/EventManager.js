@@ -24,6 +24,7 @@ class EventManager {
         this.bindSpecialInputs();
         this.bindGlobalEvents();
         this.validator.setupFormValidation();
+        this.bindProgressiveFormEvents(); // Add progressive form events
     }
 
     bindThemeEvents() {
@@ -45,7 +46,10 @@ class EventManager {
             'back-to-login-from-forgot': () => this.authManager.showStep('login-form'),
             'show-backup-code': () => this.authManager.showStep('backup-code-form'),
             'back-to-2fa': () => this.authManager.showStep('two-factor-form'),
-            'skip-2fa-setup': () => this.authManager.redirectToDashboard()
+            'skip-2fa-setup': () => this.authManager.redirectToDashboard(),
+            // New navigation for split login
+            'show-social-login': () => this.uiManager.showLoginStep(2),
+            'show-credential-login': () => this.uiManager.showLoginStep(1),
         };
 
         Object.entries(navigationEvents).forEach(([id, handler]) => {
@@ -177,6 +181,55 @@ class EventManager {
                 }
             }
         });
+    }
+
+    bindProgressiveFormEvents() {
+        const stepTransitions = {
+            'register-next-1': { next: 2, fields: ['first-name', 'last-name'] },
+            'register-next-2': { next: 3, fields: ['date-of-birth', 'username'] },
+            'register-next-3': { next: 4, fields: ['email', 'phone'] },
+            'register-next-4': { next: 5, fields: ['password', 'user-type'] },
+            'register-back-1': { back: 1 },
+            'register-back-2': { back: 2 },
+            'register-back-3': { back: 3 },
+            'register-back-4': { back: 4 },
+        };
+
+        Object.entries(stepTransitions).forEach(([id, config]) => {
+            const button = document.getElementById(id);
+            if (button) {
+                button.addEventListener('click', () => {
+                    if (config.next) {
+                        const isValid = this.validator.validateStep(config.next - 1);
+                        if (isValid) {
+                            this.uiManager.showRegisterStep(config.next);
+                            if (config.next === 3) { // Personalization on step 3
+                                const firstName = document.getElementById('first-name').value;
+                                this.uiManager.personalizeRegisterGreeting(firstName);
+                            }
+                            if (config.next === 5) { // Populate review
+                                this.uiManager.populateReviewDetails();
+                            }
+                        }
+                    } else if (config.back) {
+                        this.uiManager.showRegisterStep(config.back);
+                    }
+                });
+            }
+        });
+
+        // Bind edit buttons on the review page
+        const reviewContainer = document.getElementById('review-details-container');
+        if (reviewContainer) {
+            reviewContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('review-edit-btn')) {
+                    const step = e.target.dataset.step;
+                    if (step) {
+                        this.uiManager.showRegisterStep(parseInt(step));
+                    }
+                }
+            });
+        }
     }
 
     // Username availability checking with debouncing

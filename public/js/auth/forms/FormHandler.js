@@ -27,7 +27,7 @@ class FormHandler {
         const formData = new FormData(e.target);
         const loginData = Object.fromEntries(formData);
         loginData.rememberMe = formData.has('rememberMe');
-        
+
         if (!loginData.identifier || !loginData.password) {
             this.uiManager.showToast('Please enter both email/username and password', 'error');
             return;
@@ -41,7 +41,6 @@ class FormHandler {
 
         try {
             this.uiManager.setLoading(e.target, true);
-            console.log(loginData);
             const response = await this.apiClient.call('/login', 'POST', loginData);
 
             if (response.success) {
