@@ -2,43 +2,97 @@
 class NotificationManager {
     constructor(dashboard) {
         this.dashboard = dashboard;
+        this.allNotifications = [];
+        this.currentFilter = '';
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // Filter dropdown
+        const filterSelect = document.getElementById('notificationFilter');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', (e) => {
+                this.currentFilter = e.target.value;
+                this.applyFilterAndRender();
+            });
+        }
+
+        // Mark All Read button
+        const markAllReadBtn = document.getElementById('markAllRead');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', () => {
+                this.markAllNotificationsAsRead();
+            });
+        }
+
+        // Notification actions (using event delegation)
+        const container = document.getElementById('notificationsList');
+        if (container && !container.dataset.listenerAttached) {
+            container.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.notification-delete-btn');
+                const markReadBtn = e.target.closest('.notification-mark-read-btn');
+                const clearAllBtn = e.target.closest('#clearAllNotificationsBtn');
+
+                if (deleteBtn) {
+                    const notificationId = deleteBtn.dataset.notificationId;
+                    this.deleteNotification(notificationId);
+                } else if (markReadBtn) {
+                    const notificationId = markReadBtn.dataset.notificationId;
+                    this.markNotificationAsRead(notificationId);
+                } else if (clearAllBtn) {
+                    this.clearAllNotifications();
+                }
+            });
+
+            container.dataset.listenerAttached = "true";
+        }
     }
 
     async loadNotifications() {
         try {
             this.dashboard.loadingManager.showLoading(true);
-            const response = await this.dashboard.apiManager.makeRequest('/notifications');
-            const container = document.getElementById('notificationsList');
+            
+            // Load all notifications without filters first
+            const response = await this.dashboard.apiManager.makeRequest('/notifications?limit=50');
+            this.allNotifications = response.data.notifications || [];
+            
+            this.applyFilterAndRender();
 
-            if (!container.dataset.listenerAttached) {
-                container.addEventListener('click', (e) => {
-                    const deleteBtn = e.target.closest('.notification-delete-btn');
-                    const markReadBtn = e.target.closest('.notification-mark-read-btn');
-                    const clearAllBtn = e.target.closest('#clearAllNotificationsBtn');
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+            document.getElementById('notificationsList').innerHTML =
+                '<p class="text-center">Error loading notifications</p>';
+            this.dashboard.toastManager.showToast('error', 'Error', 'Failed to load notifications');
+        } finally {
+            this.dashboard.loadingManager.showLoading(false);
+        }
+    }
 
-                    if (deleteBtn) {
-                        const notificationId = deleteBtn.dataset.notificationId;
-                        this.deleteNotification(notificationId);
-                    } else if (markReadBtn) {
-                        const notificationId = markReadBtn.dataset.notificationId;
-                        this.markNotificationAsRead(notificationId);
-                    } else if (clearAllBtn) {
-                        this.clearAllNotifications();
-                    }
-                });
+    applyFilterAndRender() {
+        let filteredNotifications = [...this.allNotifications];
 
-                // Mark listener so it doesn't get attached again
-                container.dataset.listenerAttached = "true";
-            }
+        // Apply type filter
+        if (this.currentFilter) {
+            filteredNotifications = filteredNotifications.filter(n => n.type === this.currentFilter);
+        }
 
-            if (response.data.notifications.length === 0) {
-                container.innerHTML = '<p class="text-center">No notifications</p>';
-                this.updateNotificationBadge(0);
-                return;
-            }
+        this.renderNotifications(filteredNotifications);
+    }
 
-            // Build notifications list HTML
-            const notificationsHtml = response.data.notifications.map(notification => `
+    renderNotifications(notifications) {
+        const container = document.getElementById('notificationsList');
+
+        if (notifications.length === 0) {
+            const message = this.currentFilter 
+                ? `No ${this.currentFilter} notifications found`
+                : 'No notifications';
+            container.innerHTML = `<p class="text-center">${message}</p>`;
+            this.updateNotificationBadge(0);
+            return;
+        }
+
+        // Build notifications list HTML
+        const notificationsHtml = notifications.map(notification => `
             <div class="notification-item ${!notification.read ? 'unread' : ''}" data-notification-id="${notification.id}">
                 <div class="notification-icon ${notification.type}">
                     <i class="${this.getNotificationIcon(notification.type)}"></i>
@@ -61,23 +115,20 @@ class NotificationManager {
             </div>
         `).join('');
 
-            // Add "Clear All" button at the top
-            container.innerHTML = `
-            <div class="notification-header">
+        // Add Clear All button if there are notifications
+        const clearAllButton = notifications.length > 0 ? `
+            <div class="notification-bulk-actions">
+                <button id="clearAllNotificationsBtn" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash-alt"></i> Clear All Notifications
+                </button>
             </div>
-            ${notificationsHtml}
-        `;
+        ` : '';
 
-            const unreadCount = response.data.notifications.filter(n => !n.read).length;
-            this.updateNotificationBadge(unreadCount);
+        container.innerHTML = clearAllButton + notificationsHtml;
 
-        } catch (error) {
-            document.getElementById('notificationsList').innerHTML =
-                '<p class="text-center">Error loading notifications</p>';
-            this.dashboard.toastManager.showToast('error', 'Error', 'Failed to load notifications');
-        } finally {
-            this.dashboard.loadingManager.showLoading(false);
-        }
+        // Update badge with total unread count (not filtered)
+        const totalUnreadCount = this.allNotifications.filter(n => !n.read).length;
+        this.updateNotificationBadge(totalUnreadCount);
     }
 
     async deleteNotification(notificationId) {
@@ -88,17 +139,31 @@ class NotificationManager {
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             }
 
-            await this.dashboard.apiManager.makeRequest(`/notifications/${notificationId}`, { method: 'DELETE' });
+            await this.dashboard.apiManager.makeRequest(`/notifications/${notificationId}`, { 
+                method: 'DELETE' 
+            });
 
+            // Remove from local array
+            this.allNotifications = this.allNotifications.filter(n => n.id !== notificationId);
+
+            // Remove from DOM
             const notificationItem = document.querySelector(`.notification-item[data-notification-id="${notificationId}"]`);
             if (notificationItem) {
                 notificationItem.remove();
             }
 
-            this.updateNotificationBadge();
-        } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Error', error.message.includes('404') ? 'Notification not found' : 'Failed to delete notification');
+            // Re-render to update counts and empty states
+            this.applyFilterAndRender();
 
+            this.dashboard.toastManager.showToast('success', 'Success', 'Notification deleted');
+
+        } catch (error) {
+            console.error('Error deleting notification:', error);
+            this.dashboard.toastManager.showToast('error', 'Error', 
+                error.message.includes('404') ? 'Notification not found' : 'Failed to delete notification'
+            );
+
+            // Restore button state
             const button = document.querySelector(`.notification-delete-btn[data-notification-id="${notificationId}"]`);
             if (button) {
                 button.disabled = false;
@@ -106,7 +171,6 @@ class NotificationManager {
             }
         }
     }
-
 
     async markNotificationAsRead(notificationId) {
         try {
@@ -116,8 +180,17 @@ class NotificationManager {
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             }
 
-            await this.dashboard.apiManager.makeRequest(`/notifications/${notificationId}/read`, { method: 'PUT' });
+            await this.dashboard.apiManager.makeRequest(`/notifications/${notificationId}/read`, { 
+                method: 'PUT' 
+            });
 
+            // Update local array
+            const notification = this.allNotifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+            }
+
+            // Update DOM
             const notificationItem = document.querySelector(`.notification-item[data-notification-id="${notificationId}"]`);
             if (notificationItem) {
                 notificationItem.classList.remove('unread');
@@ -126,9 +199,14 @@ class NotificationManager {
             }
 
             this.updateNotificationBadge();
-        } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Error', error.message.includes('404') ? 'Notification not found' : 'Failed to mark notification as read');
 
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+            this.dashboard.toastManager.showToast('error', 'Error', 
+                error.message.includes('404') ? 'Notification not found' : 'Failed to mark notification as read'
+            );
+
+            // Restore button state
             const button = document.querySelector(`.notification-mark-read-btn[data-notification-id="${notificationId}"]`);
             if (button) {
                 button.disabled = false;
@@ -137,23 +215,24 @@ class NotificationManager {
         }
     }
 
-
-    updateNotificationBadge() {
-        const unreadItems = document.querySelectorAll('.notification-item.unread').length;
-        const badge = document.getElementById('notificationBadge');
-        if (badge) {
-            badge.textContent = unreadItems;
-            badge.style.display = unreadItems > 0 ? 'block' : 'none';
-        }
-    }
-
     async markAllNotificationsAsRead() {
         try {
-            await this.dashboard.apiManager.makeRequest('/notifications/mark-all-read', {
+            const markAllBtn = document.getElementById('markAllRead');
+            if (markAllBtn) {
+                markAllBtn.disabled = true;
+                markAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Marking...';
+            }
+
+            await this.dashboard.apiManager.makeRequest('/notifications/read-all', {
                 method: 'PUT'
             });
 
-            // Update all notification items in DOM
+            // Update all notifications in local array
+            this.allNotifications.forEach(notification => {
+                notification.read = true;
+            });
+
+            // Update DOM - remove unread class and mark-read buttons
             const unreadItems = document.querySelectorAll('.notification-item.unread');
             unreadItems.forEach(item => {
                 item.classList.remove('unread');
@@ -163,36 +242,90 @@ class NotificationManager {
                 }
             });
 
-            // Update notification badge
             this.updateNotificationBadge();
-
+            this.dashboard.toastManager.showToast('success', 'Success', 'All notifications marked as read');
 
         } catch (error) {
+            console.error('Error marking all notifications as read:', error);
             this.dashboard.toastManager.showToast('error', 'Error', 'Failed to mark all notifications as read');
+        } finally {
+            const markAllBtn = document.getElementById('markAllRead');
+            if (markAllBtn) {
+                markAllBtn.disabled = false;
+                markAllBtn.innerHTML = 'Mark All Read';
+            }
         }
     }
 
     async clearAllNotifications() {
-        if (!await this.dashboard.modalManager.showConfirm('Are you sure you want to delete all notifications? This action cannot be undone.')) {
+        const confirmMessage = this.currentFilter 
+            ? `Are you sure you want to delete all ${this.currentFilter} notifications? This action cannot be undone.`
+            : 'Are you sure you want to delete all notifications? This action cannot be undone.';
+
+        if (!await this.dashboard.modalManager.showConfirm(confirmMessage)) {
             return;
         }
 
         try {
-            await this.dashboard.apiManager.makeRequest('/notifications/clear-all', {
-                method: 'DELETE'
-            });
-
-            // Clear notifications from DOM
-            const container = document.getElementById('notificationsList');
-            if (container) {
-                container.innerHTML = '<p class="text-center">No notifications</p>';
+            const clearAllBtn = document.getElementById('clearAllNotificationsBtn');
+            if (clearAllBtn) {
+                clearAllBtn.disabled = true;
+                clearAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Clearing...';
             }
 
-            // Update notification badge
-            this.updateNotificationBadge();
+            if (this.currentFilter) {
+                // Clear only filtered notifications
+                const filteredNotifications = this.allNotifications.filter(n => n.type === this.currentFilter);
+                
+                // Delete each notification individually
+                for (const notification of filteredNotifications) {
+                    await this.dashboard.apiManager.makeRequest(`/notifications/${notification.id}`, {
+                        method: 'DELETE'
+                    });
+                }
+
+                // Remove from local array
+                this.allNotifications = this.allNotifications.filter(n => n.type !== this.currentFilter);
+                
+                this.dashboard.toastManager.showToast('success', 'Success', `All ${this.currentFilter} notifications cleared`);
+            } else {
+                // Clear all notifications
+                await this.dashboard.apiManager.makeRequest('/notifications/clear-all', {
+                    method: 'DELETE'
+                });
+
+                this.allNotifications = [];
+                this.dashboard.toastManager.showToast('success', 'Success', 'All notifications cleared');
+            }
+
+            // Re-render the list
+            this.applyFilterAndRender();
 
         } catch (error) {
-            this.dashboard.toastManager.showToast('error', 'Error', 'Failed to clear all notifications');
+            console.error('Error clearing notifications:', error);
+            this.dashboard.toastManager.showToast('error', 'Error', 'Failed to clear notifications');
+        } finally {
+            const clearAllBtn = document.getElementById('clearAllNotificationsBtn');
+            if (clearAllBtn) {
+                clearAllBtn.disabled = false;
+                clearAllBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Clear All Notifications';
+            }
+        }
+    }
+
+    updateNotificationBadge() {
+        const unreadCount = this.allNotifications.filter(n => !n.read).length;
+        const badge = document.getElementById('notificationBadge');
+        if (badge) {
+            badge.textContent = unreadCount;
+            badge.style.display = unreadCount > 0 ? 'block' : 'none';
+        }
+
+        // Update mark all read button state
+        const markAllBtn = document.getElementById('markAllRead');
+        if (markAllBtn) {
+            markAllBtn.disabled = unreadCount === 0;
+            markAllBtn.title = unreadCount === 0 ? 'No unread notifications' : `Mark ${unreadCount} notifications as read`;
         }
     }
 
@@ -205,5 +338,45 @@ class NotificationManager {
             'feature': 'fas fa-star'
         };
         return icons[type] || 'fas fa-bell';
+    }
+
+    // Utility method to get current filter for external use
+    getCurrentFilter() {
+        return this.currentFilter;
+    }
+
+    // Method to programmatically set filter
+    setFilter(filterType) {
+        this.currentFilter = filterType;
+        const filterSelect = document.getElementById('notificationFilter');
+        if (filterSelect) {
+            filterSelect.value = filterType;
+        }
+        this.applyFilterAndRender();
+    }
+
+    // Method to refresh notifications
+    async refreshNotifications() {
+        await this.loadNotifications();
+    }
+
+    // Get notification counts by type
+    getNotificationCounts() {
+        const counts = {
+            total: this.allNotifications.length,
+            unread: this.allNotifications.filter(n => !n.read).length,
+            byType: {}
+        };
+
+        const types = ['security', 'account', 'system', 'marketing', 'feature'];
+        types.forEach(type => {
+            const typeNotifications = this.allNotifications.filter(n => n.type === type);
+            counts.byType[type] = {
+                total: typeNotifications.length,
+                unread: typeNotifications.filter(n => !n.read).length
+            };
+        });
+
+        return counts;
     }
 }

@@ -3219,7 +3219,7 @@ html {
 }
 
 .loading-overlay.show {
-  display: flex;
+  display: block;
 }
 
 .loaderpic {
@@ -3236,7 +3236,7 @@ html {
 }
 
 .loaderpic.show {
-  display: flex;
+  display: block;
 }
 
 .loader {
