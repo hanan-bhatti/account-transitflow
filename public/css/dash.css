@@ -77,9 +77,15 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.loading {
+  display: none;
+  overflow: hidden;
+}
+
 #favicon {
   border-radius: 50%;
 }
+
 header {
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);

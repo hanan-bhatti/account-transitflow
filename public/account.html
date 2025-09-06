@@ -1040,12 +1040,136 @@
     <div id="toastContainer" class="toast-container"></div>
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
-        <div class="spinner">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
+        <div class="loader">
+            <svg height="0" width="0" viewBox="0 0 64 64" class="absolute">
+                <defs class="s-xJBuHA073rTt" xmlns="http://www.w3.org/2000/svg">
+                    <linearGradient class="s-xJBuHA073rTt" gradientUnits="userSpaceOnUse" y2="2" x2="0" y1="62" x1="0"
+                        id="gradient1">
+                        <stop class="s-xJBuHA073rTt" stop-color="#973BED"></stop>
+                        <stop class="s-xJBuHA073rTt" stop-color="#007CFF" offset="1"></stop>
+                    </linearGradient>
+                    <linearGradient class="s-xJBuHA073rTt" gradientUnits="userSpaceOnUse" y2="0" x2="0" y1="64" x1="0"
+                        id="gradient2">
+                        <stop class="s-xJBuHA073rTt" stop-color="#FFC800"></stop>
+                        <stop class="s-xJBuHA073rTt" stop-color="#F0F" offset="1"></stop>
+                        <animateTransform repeatCount="indefinite"
+                            keySplines="0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94;0.25,0.46,0.45,0.94"
+                            keyTimes="0; 0.091; 0.182; 0.273; 0.364; 0.455; 0.545; 0.636; 0.727; 0.818; 0.909; 1"
+                            dur="12s"
+                            values="0 32 32;-108 32 32;-216 32 32;-324 32 32;-432 32 32;-540 32 32;-648 32 32;-756 32 32;-864 32 32;-972 32 32;-1080 32 32;-1080 32 32"
+                            type="rotate" attributeName="gradientTransform"></animateTransform>
+                    </linearGradient>
+                    <linearGradient class="s-xJBuHA073rTt" gradientUnits="userSpaceOnUse" y2="2" x2="0" y1="62" x1="0"
+                        id="gradient3">
+                        <stop class="s-xJBuHA073rTt" stop-color="#00E0ED"></stop>
+                        <stop class="s-xJBuHA073rTt" stop-color="#00DA72" offset="1"></stop>
+                    </linearGradient>
+                    <linearGradient class="s-xJBuHA073rTt" gradientUnits="userSpaceOnUse" y2="2" x2="0" y1="62" x1="0"
+                        id="gradient4">
+                        <stop class="s-xJBuHA073rTt" stop-color="#FF6B6B"></stop>
+                        <stop class="s-xJBuHA073rTt" stop-color="#FF8E53" offset="1"></stop>
+                    </linearGradient>
+                    <linearGradient class="s-xJBuHA073rTt" gradientUnits="userSpaceOnUse" y2="2" x2="0" y1="62" x1="0"
+                        id="gradient5">
+                        <stop class="s-xJBuHA073rTt" stop-color="#4ECDC4"></stop>
+                        <stop class="s-xJBuHA073rTt" stop-color="#44A08D" offset="1"></stop>
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <!-- T -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient1)"
+                    d="M 8,8 h 48 c 0,0 0,0 0,0 M 32,8 v 48 c 0,0 0,4 0,4" class="dash" pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- R -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient2)"
+                    d="M 8,8 v 48 c 0,0 0,0 0,0 M 8,8 h 24 c 8,0 12,4 12,12 v 4 c 0,8 -4,12 -12,12 H 8 c 0,0 0,0 0,0 M 28,36 l 16,20 c 0,0 0,0 0,0"
+                    class="dash" pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- A -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient3)"
+                    d="M 14,56 L 32,8 c 0,0 0,0 0,0 L 50,56 c 0,0 0,0 0,0 M 21,40 h 22 c 0,0 0,0 0,0" class="dash"
+                    pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- N -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient4)"
+                    d="M 8,8 v 48 c 0,0 0,0 0,0 M 8,8 L 48,56 c 0,0 0,0 0,0 M 48,8 v 48 c 0,0 0,0 0,0" class="dash"
+                    pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- S -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient5)"
+                    d="M 48,16 c 0,-8 -8,-8 -8,-8 H 16 c -8,0 -8,8 -8,8 c 0,8 8,8 8,8 h 24 c 8,0 8,8 8,8 v 16 c 0,8 -8,8 -8,8 H 16 c -8,0 -8,-8 -8,-8"
+                    class="dash" pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- I -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient1)"
+                    d="M 16,8 h 32 c 0,0 0,0 0,0 M 32,8 v 48 c 0,0 0,0 0,0 M 16,56 h 32 c 0,0 0,0 0,0" class="dash"
+                    pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- T -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient2)"
+                    d="M 8,8 h 48 c 0,0 0,0 0,0 M 32,8 v 48 c 0,0 0,4 0,4" class="dash" pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- F -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient3)"
+                    d="M 8,8 v 48 c 0,0 0,0 0,0 M 8,8 h 40 c 0,0 0,0 0,0 M 8,32 h 32 c 0,0 0,0 0,0" class="dash"
+                    pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- L -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient4)"
+                    d="M 8,8 v 48 h 40 c 0,0 0,0 0,0" class="dash" pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- O -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient2)"
+                    d="M 32 32 m 0 -24 a 24 24 0 1 1 0 48 a 24 24 0 1 1 0 -48" class="spin" pathLength="360"></path>
+            </svg>
+            <div class="w-1"></div>
+
+            <!-- W -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height="64" width="64"
+                class="inline-block">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="8" stroke="url(#gradient5)"
+                    d="M 8,8 L 18,56 c 0,0 2,0 2,0 L 32,32 c 0,0 0,0 0,0 L 44,56 c 2,0 2,0 2,0 L 56,8 c 0,0 0,0 0,0"
+                    class="dash" pathLength="360"></path>
+            </svg>
         </div>
     </div>
     <div class="loaderpic" id="loaderpic">

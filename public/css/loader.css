@@ -1,43 +1,101 @@
-.spinner {
-  width: 60px;
-  height: 60px;
-  position: relative;
-}
-
-.spinner .dot {
+.absolute {
   position: absolute;
-  inset: 0;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.loader {
   display: flex;
+  margin: 0.25em 0;
+  align-items: center;
   justify-content: center;
-  animation: spin 2s infinite;
+  padding: 2em;
+  background: #1a1a1a;
+  min-height: 100vh;
 }
 
-.spinner .dot::after {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: var(--accent-primary);
+.w-1 {
+  width: 0.25em;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+.dash {
+  animation: dashArray 2s ease-in-out infinite, dashOffset 2s linear infinite;
+}
+
+.spin {
+  animation: spinDashArray 2s ease-in-out infinite, spin 8s ease-in-out infinite,
+    dashOffset 2s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes dashArray {
+  0% {
+    stroke-dasharray: 0 1 359 0;
+  }
+
+  50% {
+    stroke-dasharray: 0 359 1 0;
+  }
+
+  100% {
+    stroke-dasharray: 359 1 0 0;
   }
 }
 
-.spinner .dot:nth-child(2) {
-  animation-delay: 100ms;
+@keyframes spinDashArray {
+  0% {
+    stroke-dasharray: 270 90;
+  }
+
+  50% {
+    stroke-dasharray: 0 360;
+  }
+
+  100% {
+    stroke-dasharray: 270 90;
+  }
 }
 
-.spinner .dot:nth-child(3) {
-  animation-delay: 200ms;
+@keyframes dashOffset {
+  0% {
+    stroke-dashoffset: 365;
+  }
+
+  100% {
+    stroke-dashoffset: 5;
+  }
 }
 
-.spinner .dot:nth-child(4) {
-  animation-delay: 300ms;
+@keyframes spin {
+  0% {
+    rotate: 0deg;
+  }
+
+  12.5%,
+  25% {
+    rotate: 270deg;
+  }
+
+  37.5%,
+  50% {
+    rotate: 540deg;
+  }
+
+  62.5%,
+  75% {
+    rotate: 810deg;
+  }
+
+  87.5%,
+  100% {
+    rotate: 1080deg;
+  }
 }
 
-.spinner .dot:nth-child(5) {
-  animation-delay: 400ms;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
 }
