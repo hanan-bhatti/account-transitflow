@@ -1,22 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" itemscope itemtype="https://schema.org/WebApplication">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TransitFLOW - Authentication</title>
+
+    <!-- Primary SEO Meta Tags -->
+    <title>Sign In to TransitFLOW - Urban Transit Navigation & Route Planning</title>
+    <meta name="title" content="Sign In to TransitFLOW - Urban Transit Navigation & Route Planning">
+    <meta name="description"
+        content="Access your TransitFLOW account to plan optimal transit routes, check real-time schedules, and navigate urban transportation efficiently. Join thousands of commuters saving time daily.">
+    <meta name="keywords"
+        content="transit app, public transport app, urban transport app, city transport, route planner app, bus tracker, metro app, commuter app, transport tracker, travel app, real-time transit updates, metro train schedule app, bus schedule app, transit fare calculator, city route planning, live transport map, multi-modal transit planner, commuter route optimization, Lahore public transport app, Karachi public transport app, Islamabad commuter app, Pakistan metro tracker, Lahore bus route planner, Karachi metro train schedule, Islamabad bus tracker app, orange line metro, green line metro, blue line metro, red line metro, live station, metro timing, metro station, Speedo routes, metro route planner, Lahore orange line timing, Lahore green line metro stations, Karachi green line metro schedule, Karachi bus rapid transit, Islamabad metro bus, public transit live updates, Lahore metro stations, Karachi metro stations, Islamabad metro stations, Lahore metro map, Karachi metro map, Islamabad metro map, city transit Lahore, city transit Karachi, city transit Islamabad, bus route Lahore, bus route Karachi, bus route Islamabad">
+    <meta name="author" content="TransitFLOW">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://account.transitflow.qzz.io/login">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TransitFLOW">
+    <meta property="og:url" content="https://account.transitflow.qzz.io/login">
+    <meta property="og:title" content="Sign In to TransitFLOW - Urban Transit Navigation & Route Planning">
+    <meta property="og:description"
+        content="Access your TransitFLOW account to plan optimal transit routes, check real-time schedules, and navigate urban transportation efficiently. Join thousands of commuters saving time daily.">
+    <meta property="og:image"
+        content="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="TransitFLOW - Urban Transit Navigation App">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://account.transitflow.qzz.io/login">
+    <meta name="twitter:title" content="Sign In to TransitFLOW - Urban Transit Navigation & Route Planning">
+    <meta name="twitter:description"
+        content="Access your TransitFLOW account to plan optimal transit routes, check real-time schedules, and navigate urban transportation efficiently. Join thousands of commuters saving time daily.">
+    <meta name="twitter:image"
+        content="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj">
+    <meta name="twitter:image:alt" content="TransitFLOW - Urban Transit Navigation App">
+    <meta name="twitter:creator" content="@transitflow">
+    <meta name="twitter:site" content="@transitflow">
+
+    <!-- Additional Meta Tags for Better SEO -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="msapplication-TileColor" content="#2563eb">
+    <meta name="application-name" content="TransitFLOW">
+    <meta name="apple-mobile-web-app-title" content="TransitFLOW">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Geo Meta Tags -->
+    <meta name="geo.region" content="PK-PB">
+    <meta name="geo.placename" content="Lahore, Punjab, Pakistan">
+    <meta name="geo.position" content="31.5804;74.3587">
+    <meta name="ICBM" content="31.5804, 74.3587">
+
+    <!-- Business/Contact Information -->
+    <meta name="contact" content="support@transitflow.qzz.io">
+    <meta name="reply-to" content="support@transitflow.qzz.io">
+    <meta name="owner" content="TransitFLOW">
+    <meta name="url" content="https://transitflow.qzz.io">
+    <meta name="identifier-URL" content="https://transitflow.qzz.io">
+    <meta name="category" content="Transportation, Public Transit, Urban Planning, Mobile Apps">
+    <meta name="coverage" content="Worldwide">
+    <meta name="distribution" content="Global">
+    <meta name="rating" content="General">
+    <meta name="revisit-after" content="7 days">
+
+    <!-- Favicon and Icons -->
     <link rel="icon"
         href="https://spotless-orange-flea.myfilebase.com/ipfs/QmfQnE6xe5hSHT8gw3NDVWVXdXRmwqJa9PvScNj3fbMFgy"
         type="image/png">
+    <link rel="apple-touch-icon"
+        href="https://spotless-orange-flea.myfilebase.com/ipfs/QmfQnE6xe5hSHT8gw3NDVWVXdXRmwqJa9PvScNj3fbMFgy">
+    <link rel="shortcut icon"
+        href="https://spotless-orange-flea.myfilebase.com/ipfs/QmfQnE6xe5hSHT8gw3NDVWVXdXRmwqJa9PvScNj3fbMFgy">
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="//app.letstrack.qzz.io">
+    <link rel="dns-prefetch" href="//letsreply.dpdns.org">
+    <link rel="dns-prefetch" href="//chatwoot-production-5a33.up.railway.app">
+    <link rel="dns-prefetch" href="//transitflow2.statuspage.io">
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/boxicons.min.css">
+
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="preload"
+        href="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+        as="image">
+
+    <!-- Structured Data - Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "TransitFLOW",
+      "alternateName": "TransitFLOW App",
+      "url": "https://transitflow.qzz.io",
+      "logo": "https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+92-XXX-XXXXXXX",
+        "contactType": "Customer Service",
+        "email": "support@transitflow.qzz.io",
+        "availableLanguage": ["English", "Urdu"]
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Lahore",
+        "addressRegion": "Punjab",
+        "addressCountry": "PK"
+      },
+      "sameAs": [
+        "https://twitter.com/transitflow",
+        "https://facebook.com/transitflow",
+        "https://linkedin.com/company/transitflow"
+      ]
+    }
+    </script>
+
+    <!-- Structured Data - WebApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "TransitFLOW",
+      "description": "Urban transit navigation and route planning application for efficient public transportation",
+      "url": "https://transitflow.qzz.io",
+      "applicationCategory": "Transportation",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Real-time transit schedules",
+        "Route optimization",
+        "Multi-modal transportation planning",
+        "Live traffic updates",
+        "Fare calculation",
+        "Accessibility features"
+      ],
+      "screenshot": "https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
+    }
+    </script>
+
+    <!-- Structured Data - WebPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Sign In to TransitFLOW",
+      "description": "Access your TransitFLOW account to plan optimal transit routes and navigate urban transportation efficiently",
+      "url": "https://account.transitflow.qzz.io/login",
+      "mainEntity": {
+        "@type": "WebApplication",
+        "name": "TransitFLOW"
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://transitflow.qzz.io"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Account",
+            "item": "https://account.transitflow.qzz.io"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Sign In"
+          }
+        ]
+      }
+    }
+    </script>
+
+    <!-- Analytics -->
     <script defer src="https://app.letstrack.qzz.io/script.js"
         data-website-id="e854b045-2569-4172-a4c0-b8fcb47c5c23"></script>
 
     <!-- Matomo -->
     <script>
         var _paq = window._paq = window._paq || [];
-        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
         _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
         _paq.push(["setCookieDomain", "*.account.transitflow.qzz.io"]);
         _paq.push(["setDomains", ["*.account.transitflow.qzz.io"]]);
@@ -34,43 +214,55 @@
         <p><img referrerpolicy="no-referrer-when-downgrade" src="//letsreply.dpdns.org/matomo.php?idsite=1&amp;rec=1"
                 style="border:0;" alt="" /></p>
     </noscript>
-    <!-- End Matomo Code -->
 
 </head>
 
-<body>
+<body itemscope itemtype="https://schema.org/WebPage">
+    <!-- Skip Navigation for Accessibility -->
+    <a href="#main-content" class="skip-navigation" aria-label="Skip to main content">Skip to main content</a>
+
     <!-- Theme Toggle -->
-    <div class="theme-toggle" id="theme-toggle">
-        <i class="bx bx-moon" id="theme-icon"></i>
+    <div class="theme-toggle" id="theme-toggle" role="button" aria-label="Toggle dark/light theme" tabindex="0">
+        <i class="bx bx-moon" id="theme-icon" aria-hidden="true"></i>
     </div>
-    <div id="loadingOverlay" class="loading-overlay">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" role="dialog" aria-label="Loading TransitFLOW application">
         <div class="loading-logo-container">
             <div class="loading-logo">
                 <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmfQnE6xe5hSHT8gw3NDVWVXdXRmwqJa9PvScNj3fbMFgy"
-                    alt="TransitFLOW Logo">
+                    alt="TransitFLOW Logo - Urban Transit Navigation App" width="64" height="64" loading="eager">
             </div>
         </div>
         <div class="loading-progress-container">
-            <div class="loading-progress-bar" id="loadingProgressBar"></div>
+            <div class="loading-progress-bar" id="loadingProgressBar" role="progressbar" aria-valuenow="0"
+                aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         <div class="loading-text" id="loadingText">Loading TransitFLOW...</div>
-        <div class="loading-percentage" id="loadingPercentage">0%</div>
+        <div class="loading-percentage" id="loadingPercentage" aria-live="polite">0%</div>
     </div>
 
-    <div class="auth-page-container">
-        <div class="branding-panel">
+    <!-- Main Content -->
+    <main class="auth-page-container" id="main-content">
+        <!-- Branding Panel -->
+        <section class="branding-panel" role="banner">
             <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmZ7KzNrnnFMb7omqMpZvJXxdRddHT7XuJgSd9PUUCJ3yj"
-                alt="TransitFLOW Logo" class="branding-logo">
+                alt="TransitFLOW Logo - Urban Transit Navigation and Route Planning" class="branding-logo" width="120"
+                height="120" itemprop="logo">
             <div class="branding-content">
-                <h1 class="branding-title">TransitFLOW</h1>
-                <p class="branding-subtitle">Your city, your route, your price.</p>
+                <h1 class="branding-title" itemprop="name">TransitFLOW</h1>
+                <p class="branding-subtitle" itemprop="description">Your city, your route, your price.</p>
             </div>
             <div class="branding-quote">
-                <p>"The most reliable way to navigate the city's transit."</p>
-                <span>- Satisfied Commuter</span>
+                <blockquote>
+                    <p>"The most reliable way to navigate the city's transit."</p>
+                    <cite>- Satisfied Commuter</cite>
+                </blockquote>
             </div>
-        </div>
-        <div class="form-panel">
+        </section>
+
+        <!-- Authentication Forms Panel -->
+        <section class="form-panel" role="main">
             <div class="auth-container">
                 <div class="auth-card fade-in">
 
@@ -78,162 +270,178 @@
                     <div id="login-form" class="auth-step">
                         <!-- Step 1: Credentials -->
                         <div id="login-step-1">
-                            <div class="auth-header">
-                                <h1 class="auth-title">Welcome back</h1>
-                                <p class="auth-subtitle">Sign in to your account</p>
-                            </div>
-                            <div class="error-container"></div>
-                            <form class="auth-form" id="loginForm">
-                                <div id="login-alert"></div>
+                            <header class="auth-header">
+                                <h1 class="auth-title">Welcome back to TransitFLOW</h1>
+                                <p class="auth-subtitle">Sign in to access your transit planning dashboard</p>
+                            </header>
+                            <div class="error-container" role="alert" aria-live="polite"></div>
+                            <form class="auth-form" id="loginForm" novalidate>
+                                <div id="login-alert" role="alert" aria-live="polite"></div>
                                 <div class="form-group">
                                     <label class="form-label" for="login-identifier">Email or Username</label>
                                     <input type="text" id="login-identifier" name="identifier" class="form-input"
-                                        autocomplete="username" required>
-                                    <span class="form-error" id="login-identifier-error"></span>
+                                        autocomplete="username" aria-describedby="login-identifier-error" required>
+                                    <span class="form-error" id="login-identifier-error" role="alert"></span>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" for="login-password">Password</label>
                                     <div class="input-group">
                                         <input type="password" id="login-password" name="password" class="form-input"
-                                            autocomplete="current-password" required>
-                                        <i class="bx bx-hide input-icon" id="login-password-toggle"></i>
+                                            autocomplete="current-password" aria-describedby="login-password-error"
+                                            required>
+                                        <button type="button" class="input-icon" id="login-password-toggle"
+                                            aria-label="Toggle password visibility">
+                                            <i class="bx bx-hide" aria-hidden="true"></i>
+                                        </button>
                                     </div>
-                                    <span class="form-error" id="login-password-error"></span>
+                                    <span class="form-error" id="login-password-error" role="alert"></span>
                                 </div>
                                 <div class="checkbox-group">
                                     <input type="checkbox" id="remember-me" name="rememberMe" class="checkbox">
                                     <label for="remember-me" class="checkbox-label">Remember me for 30 days</label>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Sign In</button>
+                                <button type="submit" class="btn btn-primary">Sign In to TransitFLOW</button>
                             </form>
-                            <div class="auth-footer">
+                            <footer class="auth-footer">
                                 <p>Or <a href="#" class="auth-link" id="show-social-login">continue with a social
                                         account</a></p>
-                                <p><a href="#" class="auth-link" id="show-forgot-password">Forgot your password?</a>
+                                <p><a href="#" class="auth-link" id="show-forgot-password">Forgot your password?</a></p>
                                 <p style="margin-top: 1rem;">Don't have an account? <a href="#" class="auth-link"
-                                        id="show-register">Sign up</a></p>
-                            </div>
+                                        id="show-register">Create your free TransitFLOW account</a></p>
+                            </footer>
                         </div>
+
                         <!-- Step 2: Social Login -->
                         <div id="login-step-2" class="hidden">
-                            <div class="auth-header">
-                                <h1 class="auth-title">Welcome back</h1>
-                                <p class="auth-subtitle">Sign in with a social account</p>
-                            </div>
+                            <header class="auth-header">
+                                <h1 class="auth-title">Welcome back to TransitFLOW</h1>
+                                <p class="auth-subtitle">Sign in with your preferred social account</p>
+                            </header>
                             <div class="social-auth-section">
                                 <div class="social-buttons">
-                                    <button type="button" class="btn btn-social btn-google" id="google-login">
-                                        <i class="bx bxl-google"></i>
+                                    <button type="button" class="btn btn-social btn-google" id="google-login"
+                                        aria-label="Sign in with Google">
+                                        <i class="bx bxl-google" aria-hidden="true"></i>
                                         Continue with Google
                                     </button>
-                                    <button type="button" class="btn btn-social btn-facebook" id="facebook-login">
-                                        <i class="bx bxl-facebook"></i>
+                                    <button type="button" class="btn btn-social btn-facebook" id="facebook-login"
+                                        aria-label="Sign in with Facebook">
+                                        <i class="bx bxl-facebook" aria-hidden="true"></i>
                                         Continue with Facebook
                                     </button>
-                                    <button type="button" class="btn btn-social btn-github" id="github-login">
-                                        <i class="bx bxl-github"></i>
+                                    <button type="button" class="btn btn-social btn-github" id="github-login"
+                                        aria-label="Sign in with GitHub">
+                                        <i class="bx bxl-github" aria-hidden="true"></i>
                                         Continue with GitHub
                                     </button>
                                 </div>
                             </div>
-                            <div class="auth-footer">
+                            <footer class="auth-footer">
                                 <p><a href="#" class="auth-link" id="show-credential-login">← Back to email login</a>
                                 </p>
-                            </div>
+                            </footer>
                         </div>
                     </div>
 
                     <!-- Register Form: Progressive Steps -->
                     <div id="register-form" class="auth-step hidden">
-                        <div class="progress-bar-container">
+                        <div class="progress-bar-container" role="progressbar" aria-label="Registration progress">
                             <div class="progress-bar-fill" id="register-progress-fill"></div>
                         </div>
-                        <form class="auth-form" id="registerForm">
-                            <div id="register-alert"></div>
+                        <form class="auth-form" id="registerForm" novalidate>
+                            <div id="register-alert" role="alert" aria-live="polite"></div>
 
                             <!-- Step 1: Name -->
                             <div id="register-step-1" class="register-step">
-                                <div class="auth-header">
-                                    <h1 class="auth-title">Create your account (1/5)</h1>
-                                    <p class="auth-subtitle">Let's start with your name.</p>
-                                </div>
+                                <header class="auth-header">
+                                    <h1 class="auth-title">Join TransitFLOW Today (1/5)</h1>
+                                    <p class="auth-subtitle">Start by telling us your name.</p>
+                                </header>
                                 <div class="form-group">
                                     <label class="form-label" for="first-name">First Name *</label>
-                                    <input type="text" id="first-name" name="firstName" class="form-input" required>
-                                    <span class="form-error" id="first-name-error"></span>
+                                    <input type="text" id="first-name" name="firstName" class="form-input"
+                                        aria-describedby="first-name-error" required>
+                                    <span class="form-error" id="first-name-error" role="alert"></span>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" for="last-name">Last Name (optional)</label>
-                                    <input type="text" id="last-name" name="lastName" class="form-input">
-                                    <span class="form-error" id="last-name-error"></span>
+                                    <input type="text" id="last-name" name="lastName" class="form-input"
+                                        aria-describedby="last-name-error">
+                                    <span class="form-error" id="last-name-error" role="alert"></span>
                                 </div>
-                                <button type="button" class="btn btn-primary" id="register-next-1">Next</button>
+                                <button type="button" class="btn btn-primary" id="register-next-1">Next Step</button>
                             </div>
 
                             <!-- Step 2: Identity -->
                             <div id="register-step-2" class="register-step hidden">
-                                <div class="auth-header">
-                                    <h1 class="auth-title">About you (2/5)</h1>
-                                    <p class="auth-subtitle">Help us personalize your experience.</p>
-                                </div>
+                                <header class="auth-header">
+                                    <h1 class="auth-title">Tell us about yourself (2/5)</h1>
+                                    <p class="auth-subtitle">Help us personalize your TransitFLOW experience.</p>
+                                </header>
                                 <div class="form-group">
                                     <label class="form-label" for="date-of-birth">Date of Birth *</label>
                                     <input type="date" id="date-of-birth" name="dateOfBirth" class="form-input"
-                                        required>
-                                    <span class="form-error" id="date-of-birth-error"></span>
+                                        aria-describedby="date-of-birth-error" required>
+                                    <span class="form-error" id="date-of-birth-error" role="alert"></span>
                                 </div>
                                 <div class="form-group" style="position: relative;">
-                                    <label class="form-label" for="username">Username *</label>
+                                    <label class="form-label" for="username">Choose Username *</label>
                                     <div class="input-group">
                                         <input type="text" id="username" name="username" class="form-input"
-                                            autocomplete="username" required>
-                                        <i class=" input-icon" id="username-status"></i>
+                                            autocomplete="username" aria-describedby="username-error" required>
+                                        <i class="input-icon" id="username-status" aria-hidden="true"></i>
                                     </div>
-                                    <span class="form-error" id="username-error"></span>
-                                    <div id="username-suggestions" class="username-suggestions hidden"></div>
+                                    <span class="form-error" id="username-error" role="alert"></span>
+                                    <div id="username-suggestions" class="username-suggestions hidden" role="listbox">
+                                    </div>
                                 </div>
                                 <div class="button-group">
                                     <button type="button" class="btn btn-secondary" id="register-back-1">Back</button>
-                                    <button type="button" class="btn btn-primary" id="register-next-2">Next</button>
+                                    <button type="button" class="btn btn-primary" id="register-next-2">Next
+                                        Step</button>
                                 </div>
                             </div>
 
                             <!-- Step 3: Contact -->
                             <div id="register-step-3" class="register-step hidden">
-                                <div class="auth-header">
+                                <header class="auth-header">
                                     <h1 class="auth-title" id="register-greeting">Contact Information (3/5)</h1>
-                                    <p class="auth-subtitle">How can we reach you?</p>
-                                </div>
+                                    <p class="auth-subtitle">How can we reach you with updates?</p>
+                                </header>
                                 <div class="form-group">
-                                    <label class="form-label" for="email">Email *</label>
+                                    <label class="form-label" for="email">Email Address *</label>
                                     <input type="email" id="email" name="email" class="form-input" autocomplete="email"
-                                        required>
-                                    <span class="form-error" id="email-error"></span>
+                                        aria-describedby="email-error" required>
+                                    <span class="form-error" id="email-error" role="alert"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" for="phone">Phone (Optional)</label>
+                                    <label class="form-label" for="phone">Phone Number (Optional)</label>
                                     <input type="tel" id="phone" name="phone" class="form-input" autocomplete="tel"
-                                        placeholder="+92 3XX XXXXXXX">
-                                    <span class="form-error" id="phone-error"></span>
+                                        placeholder="+92 3XX XXXXXXX" aria-describedby="phone-error">
+                                    <span class="form-error" id="phone-error" role="alert"></span>
                                 </div>
                                 <div class="button-group">
                                     <button type="button" class="btn btn-secondary" id="register-back-2">Back</button>
-                                    <button type="button" class="btn btn-primary" id="register-next-3">Next</button>
+                                    <button type="button" class="btn btn-primary" id="register-next-3">Next
+                                        Step</button>
                                 </div>
                             </div>
 
                             <!-- Step 4: Account Details -->
                             <div id="register-step-4" class="register-step hidden">
-                                <div class="auth-header">
+                                <header class="auth-header">
                                     <h1 class="auth-title">Secure your account (4/5)</h1>
-                                    <p class="auth-subtitle">Choose a strong password.</p>
-                                </div>
+                                    <p class="auth-subtitle">Choose a strong password to protect your account.</p>
+                                </header>
                                 <div class="form-group">
                                     <label class="form-label" for="password">Password *</label>
                                     <div class="input-group">
                                         <input type="password" id="password" name="password" class="form-input"
-                                            autocomplete="current-password" required>
-                                        <i class="bx bx-hide input-icon" id="password-toggle"></i>
+                                            autocomplete="new-password" aria-describedby="password-error" required>
+                                        <button type="button" class="input-icon" id="password-toggle"
+                                            aria-label="Toggle password visibility">
+                                            <i class="bx bx-hide" aria-hidden="true"></i>
+                                        </button>
                                     </div>
                                     <div class="password-strength">
                                         <div class="strength-bar">
@@ -241,19 +449,20 @@
                                         </div>
                                         <div class="strength-text" id="strength-text">Enter a password</div>
                                     </div>
-                                    <span class="form-error" id="password-error"></span>
+                                    <span class="form-error" id="password-error" role="alert"></span>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" for="user-type">User Type *</label>
-                                    <select id="user-type" name="userType" class="form-input" required>
-                                        <option value="">Select user type</option>
+                                    <select id="user-type" name="userType" class="form-input"
+                                        aria-describedby="user-type-error" required>
+                                        <option value="">Select your user type</option>
                                         <option value="student">Student</option>
-                                        <option value="commuter">Commuter</option>
-                                        <option value="business">Business</option>
+                                        <option value="commuter">Daily Commuter</option>
+                                        <option value="business">Business User</option>
                                         <option value="individual">Individual</option>
                                         <option value="other">Other</option>
                                     </select>
-                                    <span class="form-error" id="user-type-error"></span>
+                                    <span class="form-error" id="user-type-error" role="alert"></span>
                                 </div>
                                 <div class="button-group">
                                     <button type="button" class="btn btn-secondary" id="register-back-3">Back</button>
@@ -264,177 +473,199 @@
 
                             <!-- Step 5: Review -->
                             <div id="register-step-5-review" class="register-step hidden">
-                                <div class="auth-header">
+                                <header class="auth-header">
                                     <h1 class="auth-title">Review Your Details (5/5)</h1>
                                     <p class="auth-subtitle">Please confirm your information is correct.</p>
-                                </div>
+                                </header>
                                 <div class="review-details" id="review-details-container">
                                     <!-- JS will populate this -->
                                 </div>
-                                <p class="terms-agreement">By creating account, you agree to our <a
-                                        href="https://policy.transitflow.qzz.io/terms" target="_blank"
-                                        class="auth-link">Terms of Service</a> and <a
+                                <p class="terms-agreement">By creating your account, you agree to our <a
+                                        href="https://policy.transitflow.qzz.io/terms" target="_blank" class="auth-link"
+                                        rel="noopener">Terms of Service</a> and <a
                                         href="https://policy.transitflow.qzz.io/privacy" target="_blank"
-                                        class="auth-link">Privacy Policy</a>.</p>
+                                        class="auth-link" rel="noopener">Privacy Policy</a>.</p>
                                 <div class="button-group">
                                     <button type="button" class="btn btn-secondary" id="register-back-4">Back</button>
-                                    <button type="submit" class="btn btn-primary">Confirm & Create Account</button>
+                                    <button type="submit" class="btn btn-primary">Create TransitFLOW Account</button>
                                 </div>
                             </div>
                         </form>
 
-                        <div class="auth-footer">
-                            <p>Already have an account? <a href="#" class="auth-link" id="back-to-login">Sign in</a></p>
-                        </div>
+                        <footer class="auth-footer">
+                            <p>Already have an account? <a href="#" class="auth-link" id="back-to-login">Sign in to
+                                    TransitFLOW</a></p>
+                        </footer>
                     </div>
 
                     <!-- 2FA Verification Form -->
                     <div id="two-factor-form" class="auth-step hidden">
-                        <div class="auth-header">
-                            <div class="auth-logo"><i class="bx bx-lock-alt"></i></div>
+                        <header class="auth-header">
+                            <div class="auth-logo"><i class="bx bx-lock-alt" aria-hidden="true"></i></div>
                             <h1 class="auth-title">Two-Factor Authentication</h1>
                             <p class="auth-subtitle">Enter the 6-digit code from your authenticator app</p>
-                        </div>
+                        </header>
 
-                        <!-- Error Container for 2FA -->
-                        <div class="error-container"></div>
+                        <div class="error-container" role="alert" aria-live="polite"></div>
 
-                        <form class="auth-form" id="twoFactorForm">
-                            <div id="two-factor-alert"></div>
+                        <form class="auth-form" id="twoFactorForm" novalidate>
+                            <div id="two-factor-alert" role="alert" aria-live="polite"></div>
 
-                            <div class="two-factor-grid">
-                                <input type="text" class="two-factor-input" maxlength="1" data-index="0">
-                                <input type="text" class="two-factor-input" maxlength="1" data-index="1">
-                                <input type="text" class="two-factor-input" maxlength="1" data-index="2">
-                                <input type="text" class="two-factor-input" maxlength="1" data-index="3">
-                                <input type="text" class="two-factor-input" maxlength="1" data-index="4">
-                                <input type="text" class="two-factor-input" maxlength="1" data-index="5">
+                            <div class="two-factor-grid" role="group" aria-label="Two-factor authentication code">
+                                <input type="text" class="two-factor-input" maxlength="1" data-index="0"
+                                    aria-label="Digit 1">
+                                <input type="text" class="two-factor-input" maxlength="1" data-index="1"
+                                    aria-label="Digit 2">
+                                <input type="text" class="two-factor-input" maxlength="1" data-index="2"
+                                    aria-label="Digit 3">
+                                <input type="text" class="two-factor-input" maxlength="1" data-index="3"
+                                    aria-label="Digit 4">
+                                <input type="text" class="two-factor-input" maxlength="1" data-index="4"
+                                    aria-label="Digit 5">
+                                <input type="text" class="two-factor-input" maxlength="1" data-index="5"
+                                    aria-label="Digit 6">
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Verify Code</button>
+                            <button type="submit" class="btn btn-primary">Verify Authentication Code</button>
                             <button type="button" class="btn btn-secondary" id="show-backup-code"
-                                style="margin-top: 0.5rem;">Use Backup Code</button>
+                                style="margin-top: 0.5rem;">Use Backup Code Instead</button>
                         </form>
 
-                        <div class="auth-footer">
+                        <footer class="auth-footer">
                             <p><a href="#" class="auth-link" id="back-to-login-from-2fa">← Back to login</a></p>
-                        </div>
+                        </footer>
                     </div>
 
                     <!-- Backup Code Form -->
                     <div id="backup-code-form" class="auth-step hidden">
-                        <div class="auth-header">
-                            <div class="auth-logo"><i class="bx bx-key"></i></div>
-                            <h1 class="auth-title">Backup Code</h1>
+                        <header class="auth-header">
+                            <div class="auth-logo"><i class="bx bx-key" aria-hidden="true"></i></div>
+                            <h1 class="auth-title">Backup Code Authentication</h1>
                             <p class="auth-subtitle">Enter one of your backup codes</p>
-                        </div>
+                        </header>
 
-                        <!-- Error Container for Backup Code -->
-                        <div class="error-container"></div>
+                        <div class="error-container" role="alert" aria-live="polite"></div>
 
-                        <form class="auth-form" id="backupCodeForm">
-                            <div id="backup-code-alert"></div>
+                        <form class="auth-form" id="backupCodeForm" novalidate>
+                            <div id="backup-code-alert" role="alert" aria-live="polite"></div>
 
                             <div class="form-group">
                                 <label class="form-label" for="backup-code">Backup Code</label>
                                 <input type="text" id="backup-code" name="backupCode" class="form-input"
-                                    placeholder="XXXXXXXX" maxlength="8" required>
-                                <span class="form-error" id="backup-code-error"></span>
+                                    placeholder="XXXXXXXX" maxlength="8" aria-describedby="backup-code-error" required>
+                                <span class="form-error" id="backup-code-error" role="alert"></span>
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Verify Code</button>
+                            <button type="submit" class="btn btn-primary">Verify Backup Code</button>
                         </form>
 
-                        <div class="auth-footer">
+                        <footer class="auth-footer">
                             <p><a href="#" class="auth-link" id="back-to-2fa">← Back to 2FA</a></p>
-                        </div>
+                        </footer>
                     </div>
+
                     <!-- Email Verification Form -->
                     <div id="email-verification-form" class="auth-step hidden">
-                        <div class="auth-header">
-                            <div class="auth-logo"><i class="bx bx-envelope"></i></div>
-                            <h1 class="auth-title">Verify Email</h1>
-                            <p class="auth-subtitle">Enter the 6-digit code sent to your email</p>
-                        </div>
+                        <header class="auth-header">
+                            <div class="auth-logo"><i class="bx bx-envelope" aria-hidden="true"></i></div>
+                            <h1 class="auth-title">Verify Your Email</h1>
+                            <p class="auth-subtitle">Enter the 6-digit verification code sent to your email</p>
+                        </header>
 
-                        <!-- Error Container for Email Verification -->
-                        <div class="error-container"></div>
+                        <div class="error-container" role="alert" aria-live="polite"></div>
 
-                        <form class="auth-form" id="emailVerificationForm">
-                            <div id="email-verification-alert"></div>
+                        <form class="auth-form" id="emailVerificationForm" novalidate>
+                            <div id="email-verification-alert" role="alert" aria-live="polite"></div>
 
                             <div class="form-group">
-                                <label class="form-label" for="verification-code">Verification Code</label>
+                                <label class="form-label" for="verification-code">Email Verification Code</label>
                                 <input type="text" id="verification-code" name="otp" class="form-input" maxlength="6"
-                                    pattern="[0-9]{6}" required>
-                                <span class="form-error" id="verification-code-error"></span>
+                                    pattern="[0-9]{6}" aria-describedby="verification-code-error" required>
+                                <span class="form-error" id="verification-code-error" role="alert"></span>
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Verify Email</button>
+                            <button type="submit" class="btn btn-primary">Verify Email Address</button>
                             <button type="button" class="btn btn-secondary" id="resend-verification"
-                                style="margin-top: 0.5rem;">Resend Code</button>
+                                style="margin-top: 0.5rem;">Resend Verification Code</button>
                         </form>
 
-                        <div class="auth-footer">
+                        <footer class="auth-footer">
                             <p><a href="#" class="auth-link" id="back-to-login-from-verification">← Back to login</a>
                             </p>
-                        </div>
+                        </footer>
                     </div>
 
                     <!-- Forgot Password Form -->
                     <div id="forgot-password-form" class="auth-step hidden">
-                        <div class="auth-header">
-                            <div class="auth-logo"><i class="bx bx-refresh"></i></div>
-                            <h1 class="auth-title">Reset Password</h1>
-                            <p class="auth-subtitle">Enter your email to receive reset instructions</p>
-                        </div>
+                        <header class="auth-header">
+                            <div class="auth-logo"><i class="bx bx-refresh" aria-hidden="true"></i></div>
+                            <h1 class="auth-title">Reset Your Password</h1>
+                            <p class="auth-subtitle">Enter your email address to receive password reset instructions</p>
+                        </header>
 
-                        <!-- Error Container for Forgot Password -->
-                        <div class="error-container"></div>
+                        <div class="error-container" role="alert" aria-live="polite"></div>
 
-                        <form class="auth-form" id="forgotPasswordForm">
-                            <div id="forgot-password-alert"></div>
+                        <form class="auth-form" id="forgotPasswordForm" novalidate>
+                            <div id="forgot-password-alert" role="alert" aria-live="polite"></div>
 
                             <div class="form-group">
-                                <label class="form-label" for="forgot-email">Email</label>
+                                <label class="form-label" for="forgot-email">Email Address</label>
                                 <input type="email" id="forgot-email" name="email" class="form-input"
-                                    autocomplete="email" required>
-                                <span class="form-error" id="forgot-email-error"></span>
+                                    autocomplete="email" aria-describedby="forgot-email-error" required>
+                                <span class="form-error" id="forgot-email-error" role="alert"></span>
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                            <button type="submit" class="btn btn-primary">Send Password Reset Link</button>
                         </form>
 
-                        <div class="auth-footer">
+                        <footer class="auth-footer">
                             <p><a href="#" class="auth-link" id="back-to-login-from-forgot">← Back to login</a></p>
-                        </div>
+                        </footer>
                     </div>
 
                 </div>
-                <div id="toastContainer" class="toast-container"></div>
+                <div id="toastContainer" class="toast-container" role="region" aria-label="Notifications"></div>
             </div>
-        </div>
+        </section>
+    </main>
+
+    <!-- Invisible SEO Content for Better Indexing -->
+    <div style="display: none;" aria-hidden="true">
+        <h2>TransitFLOW Features</h2>
+        <p>Real-time public transit information, route optimization, multi-modal transportation planning, fare
+            calculation, accessibility features, live traffic updates, offline maps, trip history, personalized
+            recommendations, commuter insights.</p>
+
+        <h3>Supported Cities and Transit Systems</h3>
+        <p>Urban transit navigation for buses, metro, subway, light rail, trams, ferries, rideshare integration, bicycle
+            sharing, walking directions, wheelchair accessible routes.</p>
+
+        <h3>User Benefits</h3>
+        <p>Save time commuting, reduce travel costs, discover new routes, eco-friendly transportation options, reliable
+            schedule information, departure alerts, delay notifications.</p>
     </div>
 
-    <!-- Core Dependencies -->
-    <script src="/js/auth/services/ApiClient.js"></script>
-    <script src="/js/auth/services/SocialAuthManager.js"></script>
-    <script src="/js/auth/ui/UIManager.js"></script>
-    <script src="/js/auth/ui/ThemeManager.js"></script>
-    <script src="/js/auth/validation/FormValidator.js"></script>
-    <script src="/js/auth/network/NetworkManager.js"></script>
-    <script src="/js/auth/forms/FormHandler.js"></script>
-    <script src="/js/auth/events/EventManager.js"></script>
-    <script src="/js/auth/routing/RouterManager.js"></script>
-    <script src="/js/auth/core/AuthManager.js"></script>
-    <script src="/js/auth/core/InitManager.js"></script>
-    <script src="https://transitflow2.statuspage.io/embed/script.js"></script>
-    <script>
+    <!-- Core JavaScript Dependencies -->
+    <script src="/js/auth/services/ApiClient.js" defer></script>
+    <script src="/js/auth/services/SocialAuthManager.js" defer></script>
+    <script src="/js/auth/ui/UIManager.js" defer></script>
+    <script src="/js/auth/ui/ThemeManager.js" defer></script>
+    <script src="/js/auth/validation/FormValidator.js" defer></script>
+    <script src="/js/auth/network/NetworkManager.js" defer></script>
+    <script src="/js/auth/forms/FormHandler.js" defer></script>
+    <script src="/js/auth/events/EventManager.js" defer></script>
+    <script src="/js/auth/routing/RouterManager.js" defer></script>
+    <script src="/js/auth/core/AuthManager.js" defer></script>
+    <script src="/js/auth/core/InitManager.js" defer></script>
+
+    <!-- Third-party Services -->
+    <script src="https://transitflow2.statuspage.io/embed/script.js" defer></script>
+    <script defer>
         (function (d, t) {
             var BASE_URL = "https://chatwoot-production-5a33.up.railway.app";
             var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
             g.src = BASE_URL + "/packs/js/sdk.js";
-            g.async = true;
+            g.defer = true;
             s.parentNode.insertBefore(g, s);
             g.onload = function () {
                 window.chatwootSDK.run({
@@ -443,6 +674,47 @@
                 })
             }
         })(document, "script");
+    </script>
+
+    <!-- Performance and SEO Enhancements -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://transitflow.qzz.io"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Account Login",
+          "item": "https://account.transitflow.qzz.io/login"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Page Load Performance Tracking -->
+    <script>
+        // Performance tracking for Core Web Vitals
+        new PerformanceObserver((entryList) => {
+            for (const entry of entryList.getEntries()) {
+                if (entry.entryType === 'navigation') {
+                    console.log('Page Load Time:', entry.loadEventEnd - entry.loadEventStart);
+                }
+            }
+        }).observe({ entryTypes: ['navigation'] });
+
+        // Track page visibility for better SEO signals
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+                console.log('Page became visible');
+            }
+        });
     </script>
 
 </body>
