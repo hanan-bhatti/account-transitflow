@@ -59,7 +59,7 @@ class UIManager {
         const container = document.getElementById('review-details-container');
         const form = document.getElementById('registerForm');
         if (!container || !form) return;
-        
+
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
 
@@ -220,10 +220,10 @@ class UIManager {
         if (overlay) {
             overlay.style.display = 'flex';
             overlay.classList.remove('fade-out');
-            
+
             if (withProgress) {
                 this.updateLoadingProgress(0, 'Loading TransitFLOW...');
-                
+
                 if (autoProgress) {
                     this.startAutoProgress();
                 }
@@ -236,7 +236,7 @@ class UIManager {
         if (overlay) {
             // Stop any auto progress
             this.stopAutoProgress();
-            
+
             setTimeout(() => {
                 overlay.classList.add('fade-out');
                 setTimeout(() => {
@@ -252,24 +252,24 @@ class UIManager {
         const progressBar = document.getElementById('loadingProgressBar');
         const loadingText = document.getElementById('loadingText');
         const loadingPercentage = document.getElementById('loadingPercentage');
-        
+
         if (progressBar) {
             progressBar.style.width = Math.min(Math.max(progress, 0), 100) + '%';
-            
+
             // Add type-based styling to progress bar
             progressBar.className = 'loading-progress-bar';
             if (type) {
                 progressBar.classList.add(`progress-${type}`);
             }
         }
-        
+
         if (loadingPercentage) {
             loadingPercentage.textContent = Math.round(Math.min(Math.max(progress, 0), 100)) + '%';
         }
-        
+
         if (text && loadingText) {
             loadingText.textContent = text;
-            
+
             // Add type-based styling to text
             loadingText.className = 'loading-text';
             if (type) {
@@ -282,28 +282,28 @@ class UIManager {
                 loadingText.textContent = this.loadingSteps[stepIndex];
             }
         }
-        
+
         this.loadingProgress = progress;
     }
 
     startAutoProgress(targetProgress = 90, duration = 3000) {
         this.stopAutoProgress();
-        
+
         const startProgress = this.loadingProgress;
         const progressDiff = targetProgress - startProgress;
         const stepTime = 50; // Update every 50ms
         const totalSteps = duration / stepTime;
         let currentStep = 0;
-        
+
         this.loadingInterval = setInterval(() => {
             currentStep++;
-            
+
             // Use easing function for more realistic progress
             const easeProgress = this.easeOutCubic(currentStep / totalSteps);
             const newProgress = startProgress + (progressDiff * easeProgress);
-            
+
             this.updateLoadingProgress(newProgress);
-            
+
             if (currentStep >= totalSteps || newProgress >= targetProgress) {
                 this.stopAutoProgress();
             }
@@ -330,7 +330,7 @@ class UIManager {
     // Enhanced method to simulate realistic loading with steps and types
     simulateRealisticLoading(steps = [], onComplete = null) {
         this.stopAutoProgress();
-        
+
         if (steps.length === 0) {
             steps = [
                 { progress: 10, text: "Initializing...", type: 'info', delay: 200 },
@@ -342,22 +342,22 @@ class UIManager {
                 { progress: 100, text: "Welcome to TransitFLOW!", type: 'success', delay: 300 }
             ];
         }
-        
+
         let currentStepIndex = 0;
-        
+
         const processNextStep = () => {
             if (currentStepIndex >= steps.length) {
                 if (onComplete) onComplete();
                 return;
             }
-            
+
             const step = steps[currentStepIndex];
             this.updateLoadingProgress(step.progress, step.text, step.type || 'info');
-            
+
             currentStepIndex++;
             setTimeout(processNextStep, step.delay || 500);
         };
-        
+
         processNextStep();
     }
 
@@ -419,7 +419,7 @@ class UIManager {
     focusFirstInput() {
         const currentStepElement = document.getElementById('login-form'); // Default fallback
         const targetElement = currentStepElement || document;
-        
+
         const firstInput = targetElement.querySelector('input:not([readonly]):not([type="checkbox"])');
         if (firstInput) {
             firstInput.focus();
@@ -476,12 +476,15 @@ class UIManager {
         const input = toggle.previousElementSibling;
         if (!input) return;
 
+        const icon = toggle.querySelector('i');
+        if (!icon) return;
+
         if (input.type === 'password') {
             input.type = 'text';
-            toggle.className = 'bx bx-show input-icon';
+            icon.className = 'bx bx-show';
         } else {
             input.type = 'password';
-            toggle.className = 'bx bx-hide input-icon';
+            icon.className = 'bx bx-hide';
         }
     }
 }
