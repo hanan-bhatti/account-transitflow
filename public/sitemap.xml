@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+    <!-- Root/Home Page -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <!-- Authentication Routes -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/login</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/register</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/signup</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/forgot-password</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/verify-email</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/2fa</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/backup-code</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Account Dashboard (Main Protected Routes) -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Profile Section -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/profile</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/profile/personal</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/profile/location</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Security Section -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/security</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/security/change-password</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/security/two-factor</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/security/social-accounts</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/security/delete-account</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <!-- Notifications Section -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/notifications</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Settings Section -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/settings</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/settings/general</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/settings/notifications</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/settings/privacy</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/settings/export-data</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.4</priority>
+    </url>
+
+    <!-- Devices Section -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/devices</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/devices/trusted</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Sessions Section -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/sessions</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/sessions/active</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Analytics Section -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/analytics</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Audit Logs Section -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/audit-logs</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Admin Section (Lower priority as it's restricted) -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/admin</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/admin/users</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/admin/deleted-users</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/admin/backups</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/account/admin/maintenance</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <!-- Static Pages -->
+    <url>
+        <loc>https://account.transitflow.qzz.io/privacy-terms</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/confirm-deletion</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/auth/verify-device</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.4</priority>
+    </url>
+
+    <url>
+        <loc>https://account.transitflow.qzz.io/reset-password</loc>
+        <lastmod>2025-09-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+</urlset>

@@ -59,6 +59,10 @@ app.get("/reset-password", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "reset-password.html"));
 });
 
+app.get('/sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "sitemap.xml"));
+});
+
 // ✅ Default 404 for unknown routes (must come LAST)
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
