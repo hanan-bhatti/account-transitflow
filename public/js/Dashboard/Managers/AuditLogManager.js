@@ -9,7 +9,37 @@ class AuditLogManager {
             toDate: ''
         };
         this.debounceTimer = null;
+        this.maxPages = 5;
+        this.logsPerPage = 50;
+        
+        // Set default date range to last 3 days
+        this.setDefaultDateRange();
         this.setupEventListeners();
+    }
+
+    setDefaultDateRange() {
+        const today = new Date();
+        const threeDaysAgo = new Date(today);
+        threeDaysAgo.setDate(today.getDate() - 3);
+
+        // Format dates for input fields (YYYY-MM-DD)
+        const formatDate = (date) => {
+            return date.getFullYear() + '-' + 
+                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(date.getDate()).padStart(2, '0');
+        };
+
+        this.currentFilters.fromDate = formatDate(threeDaysAgo);
+        this.currentFilters.toDate = formatDate(today);
+
+        // Set the input field values
+        setTimeout(() => {
+            const fromDateInput = document.getElementById('auditFromDate');
+            const toDateInput = document.getElementById('auditToDate');
+            
+            if (fromDateInput) fromDateInput.value = this.currentFilters.fromDate;
+            if (toDateInput) toDateInput.value = this.currentFilters.toDate;
+        }, 100);
     }
 
     setupEventListeners() {
@@ -50,16 +80,17 @@ class AuditLogManager {
             this.allAuditLogs = [];
 
             if (loadAllPages) {
-                // Load all 5 pages sequentially
+                // Load all pages sequentially
                 for (let page = 1; page <= this.maxPages; page++) {
                     const queryParams = new URLSearchParams({
                         page: page.toString(),
                         limit: this.logsPerPage.toString()
                     });
 
+                    // Updated API endpoint path to match your backend route
                     const response = await this.dashboard.apiManager.makeRequest(`/audit-logs?${queryParams}`);
                     
-                    if (response.data.auditLogs && response.data.auditLogs.length > 0) {
+                    if (response && response.data && response.data.auditLogs && response.data.auditLogs.length > 0) {
                         this.allAuditLogs = [...this.allAuditLogs, ...response.data.auditLogs];
                         
                         // If we got fewer logs than requested, we've reached the end
@@ -79,9 +110,12 @@ class AuditLogManager {
                 });
 
                 const response = await this.dashboard.apiManager.makeRequest(`/audit-logs?${queryParams}`);
-                this.allAuditLogs = response.data.auditLogs || [];
+                if (response && response.data && response.data.auditLogs) {
+                    this.allAuditLogs = response.data.auditLogs;
+                }
             }
 
+            console.log('Loaded audit logs:', this.allAuditLogs.length); // Debug log
             this.applyFiltersAndRender();
 
             return {
@@ -92,7 +126,7 @@ class AuditLogManager {
         } catch (error) {
             console.error('Error loading audit logs:', error);
             document.getElementById('auditLogsList').innerHTML =
-                '<p class="text-center">Error loading audit logs</p>';
+                '<p class="text-center">Error loading audit logs. Please check your connection and try again.</p>';
             this.dashboard.toastManager.showToast('error', 'Error', 'Failed to load audit logs');
             return null;
         } finally {
@@ -113,6 +147,7 @@ class AuditLogManager {
             filteredLogs = this.filterByDateRange(filteredLogs, this.currentFilters.fromDate, this.currentFilters.toDate);
         }
 
+        console.log('Filtered logs:', filteredLogs.length); // Debug log
         this.renderAuditLogs(filteredLogs);
     }
 
@@ -238,10 +273,16 @@ class AuditLogManager {
         const container = document.getElementById('auditLogsList');
 
         if (logs.length === 0) {
-            const message = this.currentFilters.search || this.currentFilters.fromDate || this.currentFilters.toDate
-                ? 'No audit logs match your filters'
-                : 'No audit logs available';
-            container.innerHTML = `<p class="text-center">${message}</p>`;
+            const hasActiveFilters = this.currentFilters.search || this.currentFilters.fromDate || this.currentFilters.toDate;
+            const message = hasActiveFilters
+                ? 'No audit logs match your current filters. Try adjusting your search criteria or date range.'
+                : 'No audit logs available for the selected time period.';
+            container.innerHTML = `
+                <div class="text-center" style="padding: 20px;">
+                    <p>${message}</p>
+                    ${hasActiveFilters ? '<button onclick="auditLogManager.clearFilters()" class="btn btn-secondary">Clear Filters</button>' : ''}
+                </div>
+            `;
             return;
         }
 
@@ -266,7 +307,7 @@ class AuditLogManager {
 
                 formattedDetails = lines.join('');
             } else if (typeof log.details === 'string') {
-                formattedDetails = log.details;
+                formattedDetails = `<p>${log.details}</p>`;
             }
 
             // Highlight search terms
@@ -306,6 +347,7 @@ class AuditLogManager {
     }
 
     formatActionName(action) {
+        if (!action) return 'Unknown Action';
         return action.split('_').map(word =>
             word.charAt(0).toUpperCase() + word.slice(1)
         ).join(' ');
@@ -335,6 +377,11 @@ class AuditLogManager {
     // Method to refresh logs
     async refreshLogs() {
         this.allAuditLogs = [];
+        await this.loadAuditLogs();
+    }
+
+    // Initialize method to be called when the audit logs section is shown
+    async initialize() {
         await this.loadAuditLogs();
     }
 }
