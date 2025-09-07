@@ -33,7 +33,7 @@ class AuthManager {
         
         // Ensure AuthThemeManager is available with fallback
         if (typeof AuthThemeManager === 'undefined') {
-            console.warn('AuthThemeManager not found, creating fallback theme manager');
+            this.uiManager.showToast('AuthThemeManager not found, creating fallback theme manager', 'error');
             this.themeManager = this.createFallbackThemeManager();
         } else {
             this.themeManager = new AuthThemeManager(this.config);
@@ -118,7 +118,6 @@ class AuthManager {
             }
 
         } catch (error) {
-            console.error('Failed to initialize auth system:', error);
             this.updateLoadingMessage(100, 'Initialization failed: ' + error.message, 'error');
 
             setTimeout(() => {
@@ -130,8 +129,6 @@ class AuthManager {
     }
 
     async checkAuthStatus() {
-        console.log('Checking auth status with cookie-based auth...');
-
         try {
             // Don't show loading overlay again if we're already initializing
             if (!this.isInitializing) {
@@ -179,7 +176,7 @@ class AuthManager {
                 this.handleAuthCheckFailure(response);
             }
         } catch (error) {
-            console.error('Auth check error:', error);
+            this.uiManager.showToast('Network error. Please check your connection and try again.', 'error');
             this.handleAuthCheckError(error);
         } finally {
             // Only hide loading overlay if we're not initializing and user is not authenticated
@@ -493,9 +490,7 @@ class AuthManager {
                 try {
                     const savedTheme = localStorage.getItem('theme') || 'dark';
                     document.documentElement.setAttribute('data-theme', savedTheme);
-                    console.log('Fallback theme manager initialized with theme:', savedTheme);
                 } catch (error) {
-                    console.warn('Could not initialize theme:', error);
                     document.documentElement.setAttribute('data-theme', 'dark');
                 }
             },
@@ -503,9 +498,8 @@ class AuthManager {
                 try {
                     document.documentElement.setAttribute('data-theme', theme);
                     localStorage.setItem('theme', theme);
-                    console.log('Fallback theme manager set theme:', theme);
                 } catch (error) {
-                    console.warn('Could not set theme:', error);
+                    this.uiManager.showToast('Could not save theme preference', 'error');
                 }
             },
             toggle: () => {
@@ -515,7 +509,7 @@ class AuthManager {
                     this.createFallbackThemeManager().setTheme(newTheme);
                     return newTheme;
                 } catch (error) {
-                    console.warn('Could not toggle theme:', error);
+                    this.uiManager.showToast('Could not toggle theme', 'error');
                     return 'dark';
                 }
             },
@@ -523,12 +517,12 @@ class AuthManager {
                 try {
                     return localStorage.getItem('theme') || 'dark';
                 } catch (error) {
-                    console.warn('Could not get current theme:', error);
+                    this.uiManager.showToast('Could not get current theme', 'error');
                     return 'dark';
                 }
             },
             cleanup: () => {
-                console.log('Fallback theme manager cleanup');
+                this.uiManager.showToast('Could not cleanup fallback theme manager', 'error');
             }
         };
     }

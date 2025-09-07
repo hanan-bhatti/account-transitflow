@@ -211,9 +211,9 @@ body {
 
 /* Branding Panel */
 .branding-panel {
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), 
-              url('https://spotless-orange-flea.myfilebase.com/ipfs/QmQh4dahQUTLSefDqV6P8jwueus2esGJdAjf1zoLyNxwMD');
-  background-size: 100% 100%;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)),
+              url('https://spotless-orange-flea.myfilebase.com/ipfs/QmSjV2aDf9Dwm4UkpS1po2RoWeQG23wyeaK1uAC3DnHgSb');
+  background-size: cover; /* Cover maintains aspect ratio while filling the container */
   background-position: center;
   background-attachment: fixed;
   display: flex;
