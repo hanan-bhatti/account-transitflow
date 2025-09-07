@@ -257,7 +257,7 @@ class UIManager {
             progressBar.style.width = Math.min(Math.max(progress, 0), 100) + '%';
 
             // Add type-based styling to progress bar
-            progressBar.className = 'loading-progress-bar';
+            progressBar.className = 'journey-progress';
             if (type) {
                 progressBar.classList.add(`progress-${type}`);
             }
@@ -267,8 +267,16 @@ class UIManager {
             loadingPercentage.textContent = Math.round(Math.min(Math.max(progress, 0), 100)) + '%';
         }
 
+        const dotsHtml = `
+        <div class="loading-dots">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        </div>
+        `;
+
         if (text && loadingText) {
-            loadingText.textContent = text;
+            loadingText.innerHTML = text + dotsHtml;
 
             // Add type-based styling to text
             loadingText.className = 'loading-text';
@@ -279,7 +287,7 @@ class UIManager {
             // Auto-update text based on progress
             const stepIndex = Math.floor((progress / 100) * this.loadingSteps.length);
             if (stepIndex < this.loadingSteps.length && stepIndex >= 0) {
-                loadingText.textContent = this.loadingSteps[stepIndex];
+                loadingText.innerHTML = this.loadingSteps[stepIndex] + dotsHtml;
             }
         }
 

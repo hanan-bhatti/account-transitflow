@@ -228,18 +228,45 @@
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay" role="dialog" aria-label="Loading TransitFLOW application">
-        <div class="loading-logo-container">
-            <div class="loading-logo">
-                <img src="https://spotless-orange-flea.myfilebase.com/ipfs/QmfQnE6xe5hSHT8gw3NDVWVXdXRmwqJa9PvScNj3fbMFgy"
-                    alt="TransitFLOW Logo - Urban Transit Navigation App" width="64" height="64" loading="eager">
+        <div class="loading-bg">
+            <div class="bg-pattern"></div>
+        </div>
+
+        <div class="loading-container">
+            <div class="progress-ring">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                    <circle class="progress-ring-circle" cx="40" cy="40" r="36" stroke-dasharray="0 251"></circle>
+                </svg>
+            </div>
+
+            <div class="logo-container">
+                <div class="logo">
+                    <span class="transit">Transit</span><span class="flow">FLOW</span>
+                </div>
+                <div class="tagline">Your journey, simplified</div>
+            </div>
+
+            <div class="journey-animation">
+                <div class="journey-track">
+                    <div class="journey-progress" id="loadingProgressBar"></div>
+                </div>
+                <div class="transit-vehicle"></div>
+                <div class="route-points">
+                    <div class="route-point"></div>
+                    <div class="route-point"></div>
+                    <div class="route-point"></div>
+                    <div class="route-point"></div>
+                    <div class="route-point"></div>
+                </div>
+            </div>
+
+            <div class="loading-text">
+                <div class="loading-message" id="loadingText">
+                    Setting up your account
+                </div>
+                <div class="loading-submessage" id="loadingPercentage">Please wait while we prepare your transit experience</div>
             </div>
         </div>
-        <div class="loading-progress-container">
-            <div class="loading-progress-bar" id="loadingProgressBar" role="progressbar" aria-valuenow="0"
-                aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        <div class="loading-text" id="loadingText">Loading TransitFLOW...</div>
-        <div class="loading-percentage" id="loadingPercentage" aria-live="polite">0%</div>
     </div>
 
     <!-- Main Content -->
