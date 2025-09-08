@@ -44,6 +44,15 @@
   --transition: all 0.2s ease;
   --transition-fast: all 0.15s ease;
   --transition-slow: all 0.3s ease;
+
+  --transit-orange: #ff6b35;
+  --transit-blue: #1e90ff;
+  --transit-navy: #0f1419;
+  --bg-dark: #0f1419;
+  --bg-darker: #0a0e13;
+  --text-white: #ffffff;
+  --text-gray: #94a3b8;
+  --text-light-gray: #cbd5e1;
 }
 
 /* Dark Theme */
@@ -1224,6 +1233,7 @@ body {
 
 /* Button Group */
 .button-group {
+  padding-top: 10px;
   display: flex;
   gap: 0.75rem;
 }
