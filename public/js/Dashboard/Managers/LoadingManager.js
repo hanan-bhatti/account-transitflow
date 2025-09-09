@@ -7,9 +7,15 @@ class LoadingManager {
     showLoading(show) {
         const body = document.body;
         const overlay = document.getElementById('loadingOverlay');
+
         if (show) {
-            overlay.classList.add('show');
-            body.classList.add('loading');
+
+            if (!overlay.classList.contains('show')) {
+                overlay.classList.add('show');
+            }
+            if (!body.classList.contains('loading')) {
+                body.classList.add('loading');
+            }
         } else {
             overlay.classList.remove('show');
             body.classList.remove('loading');

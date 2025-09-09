@@ -11,7 +11,7 @@
     <meta name="description"
         content="Access your TransitFLOW account to plan optimal transit routes, check real-time schedules, and navigate urban transportation efficiently. Join thousands of commuters saving time daily.">
     <meta name="keywords"
-        content="transit app, public transport app, urban transport app, city transport, route planner app, bus tracker, metro app, commuter app, transport tracker, travel app, real-time transit updates, metro train schedule app, bus schedule app, transit fare calculator, city route planning, live transport map, multi-modal transit planner, commuter route optimization, Lahore public transport app, Karachi public transport app, Islamabad commuter app, Pakistan metro tracker, Lahore bus route planner, Karachi metro train schedule, Islamabad bus tracker app, orange line metro, green line metro, blue line metro, red line metro, live station, metro timing, metro station, Speedo routes, metro route planner, Lahore orange line timing, Lahore green line metro stations, Karachi green line metro schedule, Karachi bus rapid transit, Islamabad metro bus, public transit live updates, Lahore metro stations, Karachi metro stations, Islamabad metro stations, Lahore metro map, Karachi metro map, Islamabad metro map, city transit Lahore, city transit Karachi, city transit Islamabad, bus route Lahore, bus route Karachi, bus route Islamabad">
+        content="transit app, public transport app, urban transport app, city transport, route planner app, bus tracker, metro app, commuter app, transport tracker, travel app, real-time transit updates, metro train schedule app, bus schedule app, transit fare calculator, city route planning, live transport map, multi-modal transit planner, commuter route optimization, Lahore public transport app, Karachi public transport app, Islamabad commuter app, Pakistan metro tracker, Lahore bus route planner, Karachi metro train schedule, Islamabad bus tracker app, orange line metro, orange line metro, blue line metro, red line metro, live station, metro timing, metro station, Speedo routes, metro route planner, Lahore orange line timing, Lahore orange line metro stations, Karachi orange line metro schedule, Karachi bus rapid transit, Islamabad metro bus, public transit live updates, Lahore metro stations, Karachi metro stations, Islamabad metro stations, Lahore metro map, Karachi metro map, Islamabad metro map, city transit Lahore, city transit Karachi, city transit Islamabad, bus route Lahore, bus route Karachi, bus route Islamabad">
     <meta name="author" content="TransitFLOW">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://account.transitflow.qzz.io/login">
@@ -214,6 +214,7 @@
         <p><img referrerpolicy="no-referrer-when-downgrade" src="//letsreply.dpdns.org/matomo.php?idsite=1&amp;rec=1"
                 style="border:0;" alt="" /></p>
     </noscript>
+    <!-- End Matomo Code -->
 
 </head>
 
@@ -264,7 +265,8 @@
                 <div class="loading-message" id="loadingText">
                     Setting up your account
                 </div>
-                <div class="loading-submessage" id="loadingPercentage">Please wait while we prepare your transit experience</div>
+                <div class="loading-submessage" id="loadingPercentage">Please wait while we prepare your transit
+                    experience</div>
             </div>
         </div>
     </div>
@@ -277,7 +279,7 @@
                 alt="TransitFLOW Logo - Urban Transit Navigation and Route Planning" class="branding-logo" width="120"
                 height="120" itemprop="logo">
             <div class="branding-content">
-                <h1 class="branding-title" itemprop="name">TransitFLOW</h1>
+                <h1 class="branding-title" itemprop="name">Transit<span>FLOW</span></h1>
                 <p class="branding-subtitle" itemprop="description">Your city, your route, your price.</p>
             </div>
             <div class="branding-quote">
@@ -323,9 +325,18 @@
                                     </div>
                                     <span class="form-error" id="login-password-error" role="alert"></span>
                                 </div>
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="remember-me" name="rememberMe" class="checkbox">
-                                    <label for="remember-me" class="checkbox-label">Remember me for 30 days</label>
+                                <div class="magnetic-group">
+                                    <div class="magnetic-checkbox">
+                                        <input type="checkbox" id="remember-me" name="rememberMe">
+                                        <div class="magnetic-field"></div>
+                                        <div class="magnetic-core"></div>
+                                        <div class="magnetic-particle"></div>
+                                        <div class="magnetic-particle"></div>
+                                        <div class="magnetic-particle"></div>
+                                        <div class="magnetic-particle"></div>
+                                    </div>
+                                    <label for="remember-me" class="checkbox-label-extraordinary">Remember me for 30
+                                        days</label>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Sign In to TransitFLOW</button>
                             </form>
@@ -687,12 +698,13 @@
 
     <!-- Third-party Services -->
     <script src="https://transitflow2.statuspage.io/embed/script.js" defer></script>
-    <script defer>
+    <script>
+        window.chatwootSettings = { "position": "left", "type": "expanded_bubble", "launcherTitle": "Having trouble signing in?" };
         (function (d, t) {
             var BASE_URL = "https://chatwoot-production-5a33.up.railway.app";
             var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
             g.src = BASE_URL + "/packs/js/sdk.js";
-            g.defer = true;
+            g.async = true;
             s.parentNode.insertBefore(g, s);
             g.onload = function () {
                 window.chatwootSDK.run({

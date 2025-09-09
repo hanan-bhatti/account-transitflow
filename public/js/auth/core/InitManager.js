@@ -102,8 +102,9 @@ class InitManager {
                 
                 .top-loader-bar {
                     height: 100%;
-                    background: linear-gradient(90deg, #3b82f6, #10b981);
+                    background: linear-gradient(135deg, var(--transit-blue), var(--transit-orange));
                     width: 0%;
+                    z-index: 10001;
                     transition: width 0.3s ease;
                 }
                 

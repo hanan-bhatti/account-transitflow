@@ -72,7 +72,7 @@ class FormValidator {
         } else if (type === 'email' && value && !this.isValidEmail(value)) {
             errorMessage = 'Please enter a valid email address';
             isValid = false;
-        } else if (name === 'password' && value && !this.isValidPassword(value)) {
+        } else if (name === 'password' && id !== 'login-password' && value && !this.isValidPassword(value)) {
             errorMessage = 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
             isValid = false;
         } else if (name === 'username' && value && !this.isValidUsername(value)) {
